@@ -41,28 +41,6 @@ body{
     radial-gradient(900px 650px at 50% 70%, rgba(57,255,20,.06), transparent 70%);
 }
 
-/* subtle grid (real radar feel = present but not dominant) */
-.grid{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  opacity:.16;
-  mix-blend-mode:screen;
-  background:
-    repeating-linear-gradient(0deg,
-      rgba(57,255,20,.18),
-      rgba(57,255,20,.18) 1px,
-      transparent 1px,
-      transparent 56px
-    ),
-    repeating-linear-gradient(90deg,
-      rgba(57,255,20,.18),
-      rgba(57,255,20,.18) 1px,
-      transparent 1px,
-      transparent 56px
-    );
-}
-
 /* BIG range rings (bigger + brighter so you actually see them) */
 .rings{
   position:fixed;
@@ -273,7 +251,6 @@ body{
 
 <body>
   <div class="bg"></div>
-  <div class="grid"></div>
   <div class="rings"></div>
   <div class="centerDot"></div>
   <div class="blips"></div>
