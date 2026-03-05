@@ -262,7 +262,53 @@ opacity:.7;
 @media (prefers-reduced-motion: reduce){
   .radar::before, .clutter{ animation:none !important; }
 }
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .radar::before, .clutter{ animation:none !important; }
+}
 
+/* MOBILE LAYOUT FIX */
+@media (max-width: 520px){
+
+  body{
+    height:auto;
+    min-height:100svh;
+    padding:22px 14px;
+  }
+
+  .wrapper{
+    padding:22px 10px;
+    max-width:100%;
+  }
+
+  .logo img{
+    width:min(320px,82vw);
+  }
+
+  .services{
+    margin-top:22px;
+    font-size:clamp(14px,4.2vw,18px);
+    letter-spacing:1.5px;
+    line-height:1.7;
+    padding:0 6px;
+    word-break:break-word;
+  }
+
+  .divider{
+    width:min(320px,80vw);
+    margin:22px auto;
+  }
+
+  .coming{
+    font-size:16px;
+    letter-spacing:4px;
+  }
+
+  .footer{
+    font-size:12px;
+    letter-spacing:1.5px;
+  }
+}
 </style>
 
 </head>
