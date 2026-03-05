@@ -196,6 +196,51 @@
       to{ transform:translate(-50%,-50%) rotate(360deg); }
     }
 
+    /* ===== COORDINATE LABELS (NEW) ===== */
+    .coords{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1; /* above background, below wrapper */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      mix-blend-mode:screen;
+      opacity:.55;
+      text-shadow: 0 0 10px rgba(57,255,20,.35);
+    }
+
+    .coordsField{
+      position:relative;
+      width:min(112vmin, 1220px);
+      height:min(112vmin, 1220px);
+      border-radius:50%;
+    }
+
+    .coord{
+      position:absolute;
+      font-weight:700;
+      letter-spacing:2px;
+      font-size:12px;
+      color:rgba(57,255,20,.85);
+      opacity:.75;
+      user-select:none;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .coord.n{ left:50%; top:10px; transform:translateX(-50%); }
+    .coord.e{ right:10px; top:50%; transform:translateY(-50%); }
+    .coord.s{ left:50%; bottom:10px; transform:translateX(-50%); }
+    .coord.w{ left:10px; top:50%; transform:translateY(-50%); }
+
+    @media (max-width: 520px){
+      .coord{ font-size:11px; letter-spacing:1.6px; }
+      .coord.n{ top:8px; }
+      .coord.e{ right:8px; }
+      .coord.s{ bottom:8px; }
+      .coord.w{ left:8px; }
+    }
+
     /* ===== BLIPS LAYER ===== */
     .blips{
       position:fixed;
@@ -396,6 +441,16 @@
     <div class="radarBeam" id="radarBeam"></div>
   </div>
 
+  <!-- COORDS (NEW) -->
+  <div class="coords">
+    <div class="coordsField">
+      <div class="coord n">000</div>
+      <div class="coord e">090</div>
+      <div class="coord s">180</div>
+      <div class="coord w">270</div>
+    </div>
+  </div>
+
   <div class="blips">
     <div class="blipField" id="blipField">
       <div class="blip" data-angle="18"  data-r="0.62"></div>
@@ -422,7 +477,6 @@
 
     <div class="coming">COMING SOON</div>
 
-    <!-- NEW: service area line (only change) -->
     <div class="footer">Serving Staten Island</div>
 
     <div class="footer">
