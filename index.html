@@ -279,21 +279,33 @@
       animation: blipPing .9s ease-out;
     }
 
-    @keyframes blipPing{
-      0%{
-        opacity:1;
-        background:rgba(57,255,20,.95);
-        box-shadow:
-          0 0 0 0 rgba(57,255,20,.65),
-          0 0 18px 2px rgba(57,255,20,.55);
-      }
-      55%{
-        opacity:.70;
-        background:rgba(57,255,20,.55);
-        box-shadow:
-          0 0 0 14px rgba(57,255,20,.12),
-          0 0 10px 1px rgba(57,255,20,.25);
-      }
+   @keyframes blipPing{
+
+  0%{
+    opacity:1;
+    background:rgba(57,255,20,.95);
+    box-shadow:
+      0 0 0 0 rgba(57,255,20,.65),
+      0 0 18px 2px rgba(57,255,20,.55);
+  }
+
+  40%{
+    opacity:.65;
+    background:rgba(57,255,20,.55);
+    box-shadow:
+      0 0 0 10px rgba(57,255,20,.20),
+      0 0 10px rgba(57,255,20,.25);
+  }
+
+  100%{
+    opacity:.25; /* returns to base state */
+    background:rgba(57,255,20,.25);
+    box-shadow:
+      0 0 0 22px rgba(57,255,20,0),
+      0 0 6px 0 rgba(57,255,20,0);
+  }
+
+}
       100%{
         opacity:.25; /* back to baseline */
         background:rgba(57,255,20,.25);
