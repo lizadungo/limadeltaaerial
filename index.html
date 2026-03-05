@@ -23,7 +23,7 @@
 
 body{
 margin:0;
-height:100vh;
+min-height:100vh;
 background:var(--black);
 color:var(--white);
 font-family:'Montserrat', sans-serif;
@@ -31,7 +31,8 @@ display:flex;
 align-items:center;
 justify-content:center;
 text-align:center;
-overflow:hidden;
+overflow-x:hidden;
+overflow-y:auto;
 }
 
 /* RADAR BACKGROUND (polar, no square grid) */
@@ -152,6 +153,27 @@ mix-blend-mode:screen;
 }
 
 .radar::before{
+.radar{
+   ...
+}
+
+.radar::before{
+   ...
+}
+
+/* ⬇️ PASTE THE BLIP CODE RIGHT HERE */
+
+.blips{
+   ...
+}
+
+.blips::before{
+   ...
+}
+
+@keyframes blipPulse{
+   ...
+}
 content:"";
 position:absolute;
 width:140vmax;
@@ -319,6 +341,7 @@ opacity:.7;
 <div class="bearingRing"></div>
 <div class="clutter"></div>
 <div class="radar"></div>
+<div class="blips"></div>
 
 <div class="wrapper">
 
