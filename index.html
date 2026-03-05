@@ -170,7 +170,6 @@
       z-index:0;
     }
 
-    /* IMPORTANT: keep a real element we can read angle from */
     .radarBeam{
       position:absolute;
       width:140vmax;
@@ -197,19 +196,18 @@
       to{ transform:translate(-50%,-50%) rotate(360deg); }
     }
 
-    /* ===== BLIPS LAYER (NEW) ===== */
+    /* ===== BLIPS LAYER ===== */
     .blips{
       position:fixed;
       inset:0;
       pointer-events:none;
-      z-index:1; /* above background, below wrapper */
+      z-index:1;
       display:flex;
       align-items:center;
       justify-content:center;
       mix-blend-mode:screen;
     }
 
-    /* container matches ring size so blips sit "on" radar */
     .blipField{
       position:relative;
       width:min(108vmin, 1180px);
@@ -231,7 +229,6 @@
       transition: opacity .25s ease;
     }
 
-    /* "ping" state when beam hits */
     .blip.ping{
       opacity:1;
       background:rgba(57,255,20,.95);
@@ -399,10 +396,8 @@
     <div class="radarBeam" id="radarBeam"></div>
   </div>
 
-  <!-- BLIPS (NEW) -->
   <div class="blips">
     <div class="blipField" id="blipField">
-      <!-- Add/remove blips here. data-angle degrees, data-r radius (0–1) -->
       <div class="blip" data-angle="18"  data-r="0.62"></div>
       <div class="blip" data-angle="71"  data-r="0.38"></div>
       <div class="blip" data-angle="132" data-r="0.54"></div>
@@ -427,6 +422,9 @@
 
     <div class="coming">COMING SOON</div>
 
+    <!-- NEW: service area line (only change) -->
+    <div class="footer">Serving Staten Island</div>
+
     <div class="footer">
       <a href="mailto:hello@limadeltaaerial.com">hello@limadeltaaerial.com</a>
     </div>
@@ -437,7 +435,6 @@
   </div>
 
   <script>
-    // ===== Blip positioning (polar -> x,y) =====
     (function initBlips(){
       const field = document.getElementById('blipField');
       if(!field) return;
@@ -446,12 +443,10 @@
       const size = () => field.getBoundingClientRect().width;
 
       const place = () => {
-        const radiusPx = size() * 0.5; // field is a circle
+        const radiusPx = size() * 0.5;
         blips.forEach(b => {
           const angDeg = parseFloat(b.dataset.angle || "0");
           const r = Math.max(0, Math.min(1, parseFloat(b.dataset.r || "0.5")));
-
-          // convert: 0deg = up, clockwise
           const theta = (angDeg - 90) * Math.PI / 180;
 
           const dist = radiusPx * r;
@@ -466,30 +461,25 @@
       window.addEventListener('resize', place);
     })();
 
-    // ===== Sweep detection: flash blips when beam passes their angle =====
     (function sweepDetect(){
-      const beam = document.getElementById('radarBeam');
       const field = document.getElementById('blipField');
-      if(!beam || !field) return;
+      if(!field) return;
 
       const blips = Array.from(field.querySelectorAll('.blip'));
-      const sweepPeriodMs = 8000; // must match CSS sweep 8s
-      const hitWindowDeg = 3.5;   // how close the beam must be to "hit"
-      const cooldownMs = 700;     // prevents double-trigger on same pass
+      const sweepPeriodMs = 8000;
+      const hitWindowDeg = 3.5;
+      const cooldownMs = 700;
 
       const lastHit = new WeakMap();
-
-      // time-based angle is more reliable than reading computed transforms
       const start = performance.now();
 
       function tick(now){
         const t = (now - start) % sweepPeriodMs;
-        const sweepAngle = (t / sweepPeriodMs) * 360; // 0..360
+        const sweepAngle = (t / sweepPeriodMs) * 360;
 
         blips.forEach(b => {
           const a = (parseFloat(b.dataset.angle || "0") % 360 + 360) % 360;
 
-          // shortest angular distance (wrap-around safe)
           let d = Math.abs(sweepAngle - a);
           if(d > 180) d = 360 - d;
 
@@ -497,8 +487,7 @@
             const last = lastHit.get(b) || 0;
             if(now - last > cooldownMs){
               lastHit.set(b, now);
-              b.classList.remove('ping'); // restart animation
-              // force reflow so animation restarts reliably
+              b.classList.remove('ping');
               void b.offsetWidth;
               b.classList.add('ping');
             }
