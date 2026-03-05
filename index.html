@@ -1,297 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lima Delta Aerial | Drone Services</title>
 
-<title>Lima Delta Aerial | Drone Services</title>
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon.png" />
 
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png" />
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet" />
+  <meta property="og:title" content="Lima Delta Aerial" />
+  <meta property="og:description" content="Drone Services • Construction Documentation • Drone Repair (Coming Soon)" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://limadeltaaerial.com" />
 
-<style>
-:root{
-  --lime:#39ff14;
-  --black:#000;
-  --white:#fff;
-}
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet" />
 
-*{ box-sizing:border-box; }
+  <style>
+    :root{
+      --lime:#39ff14;
+      --black:#000;
+      --white:#fff;
+      --muted:rgba(255,255,255,.72);
 
-body{
-  margin:0;
-  min-height:100vh;
-  background:var(--black);
-  color:var(--white);
-  font-family:'Montserrat',sans-serif;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  overflow:hidden;
-}
+      /* knobs */
+      --ringOpacity:.26;
+      --sweepOpacity:.22;
+      --scanOpacity:.10;
+      --noiseOpacity:.07;
+      --speckleOpacity:.22;
+    }
 
-/* soft ambient glow */
-.bg{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(900px 650px at 50% 40%, rgba(57,255,20,.14), transparent 62%),
-    radial-gradient(900px 650px at 50% 70%, rgba(57,255,20,.06), transparent 70%);
-}
+    *{ box-sizing:border-box; }
 
-/* BIG range rings (bigger + brighter so you actually see them) */
-.rings{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:none;
-  opacity:.48;
-  mix-blend-mode:screen;
-}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:var(--black);
+      color:var(--white);
+      font-family:'Montserrat', sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      overflow:hidden;
+    }
 
-.rings::before{
-  content:"";
-  width:min(108vmin, 1180px);
-  height:min(108vmin, 1180px);
-  border-radius:50%;
-  background:
-    radial-gradient(circle at center,
-      transparent 0%,
-      transparent 18%,
-      rgba(57,255,20,.48) 18.2%,
-      transparent 18.6%,
+    /* ============ ATMOSPHERE ============ */
+    .bg{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(900px 520px at 50% 35%, rgba(57,255,20,.09), transparent 60%),
+        radial-gradient(820px 520px at 18% 80%, rgba(57,255,20,.05), transparent 65%),
+        radial-gradient(820px 520px at 82% 82%, rgba(57,255,20,.04), transparent 65%),
+        linear-gradient(180deg, rgba(255,255,255,.03), transparent 45%);
+    }
 
-      transparent 36%,
-      rgba(57,255,20,.40) 36.2%,
-      transparent 36.6%,
+    .scanlines{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:var(--scanOpacity);
+      background:repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.06),
+        rgba(255,255,255,.06) 1px,
+        transparent 1px,
+        transparent 7px
+      );
+      mix-blend-mode:overlay;
+    }
 
-      transparent 54%,
-      rgba(57,255,20,.32) 54.2%,
-      transparent 54.6%,
+    .noise{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:var(--noiseOpacity);
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      mix-blend-mode:overlay;
+    }
 
-      transparent 72%,
-      rgba(57,255,20,.26) 72.2%,
-      transparent 72.6%,
+    /* ============ RADAR CORE ============ */
+    .radarWrap{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      display:grid;
+      place-items:center;
+      z-index:1;
+    }
 
-      transparent 90%,
-      rgba(57,255,20,.20) 90.2%,
-      transparent 90.6%
-    );
-  filter: drop-shadow(0 0 18px rgba(57,255,20,.28));
-}
+    /* This is the circular “scope” sizing */
+    .scope{
+      width:min(86vmin, 920px);
+      aspect-ratio:1/1;
+      position:relative;
+      border-radius:50%;
+      filter: blur(.1px);
+    }
 
-/* outer radar ring with bearing ticks */
+    /* RANGE RINGS (stronger, cleaner) */
+    .rings{
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      opacity:var(--ringOpacity);
+      background:
+        radial-gradient(circle at center,
+          transparent 0%,
+          transparent 19.7%,
+          rgba(57,255,20,.22) 19.9%,
+          transparent 20.1%,
 
-.bearingRing{
-position:fixed;
-inset:0;
-pointer-events:none;
-display:flex;
-align-items:center;
-justify-content:center;
-mix-blend-mode:screen;
-opacity:.45;
-}
+          transparent 39.7%,
+          rgba(57,255,20,.18) 39.9%,
+          transparent 40.1%,
 
-.bearingRing::before{
-content:"";
-width:min(112vmin,1200px);
-height:min(112vmin,1200px);
-border-radius:50%;
+          transparent 59.7%,
+          rgba(57,255,20,.15) 59.9%,
+          transparent 60.1%,
 
-/* outer circle */
-box-shadow:0 0 0 2px rgba(57,255,20,.45);
+          transparent 79.7%,
+          rgba(57,255,20,.12) 79.9%,
+          transparent 80.1%,
 
-/* tick marks */
-background:
-repeating-conic-gradient(
-rgba(57,255,20,.55) 0deg 1deg,
-transparent 1deg 15deg
-);
+          transparent 100%
+        );
+    }
 
-mask:
-radial-gradient(circle,
-transparent 96%,
-black 96.3%);
-}
-  
-/* subtle center dot (helps radar realism without crosshair lines) */
-.centerDot{
-  position:fixed;
-  left:50%;
-  top:50%;
-  width:6px;
-  height:6px;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  background:rgba(57,255,20,.55);
-  box-shadow:0 0 12px rgba(57,255,20,.35);
-  pointer-events:none;
-  opacity:.55;
-  mix-blend-mode:screen;
-}
+    /* OUTER RING STROKE (to make boundary feel real) */
+    .outerRing{
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      border:1px solid rgba(57,255,20,.22);
+      box-shadow:
+        0 0 18px rgba(57,255,20,.08) inset,
+        0 0 26px rgba(57,255,20,.06);
+      opacity:.55;
+    }
 
-/* Darker blips (less bright, more “contact” subtlety) */
-.blips{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  opacity:.12;           /* darker overall */
-  mix-blend-mode:screen;
-  filter: blur(.15px);
-  background:
-    radial-gradient(circle, rgba(57,255,20,.55) 0 1px, transparent 2px) 12% 26%/420px 420px,
-    radial-gradient(circle, rgba(57,255,20,.50) 0 1px, transparent 2px) 68% 34%/520px 520px,
-    radial-gradient(circle, rgba(57,255,20,.45) 0 1px, transparent 2px) 44% 78%/480px 480px,
-    radial-gradient(circle, rgba(57,255,20,.40) 0 1px, transparent 2px) 80% 70%/560px 560px;
-  animation: drift 22s linear infinite;
-}
+    /* TICK MARKS (outer ring + subtle inner) */
+    .ticks{
+      position:absolute;
+      inset:-4%;
+      border-radius:50%;
+      opacity:.30;
+      background:
+        /* outer major ticks */
+        repeating-conic-gradient(
+          from -90deg,
+          rgba(57,255,20,.55) 0deg 1deg,
+          transparent 1deg 6deg
+        );
+      -webkit-mask:
+        radial-gradient(circle at center, transparent 0 88%, #000 89% 100%);
+              mask:
+        radial-gradient(circle at center, transparent 0 88%, #000 89% 100%);
+      filter: blur(.2px);
+    }
 
-@keyframes drift{
-  from{ transform: translate3d(0,0,0); }
-  to{ transform: translate3d(90px,-70px,0); }
-}
+    .ticksInner{
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      opacity:.16;
+      background:
+        /* inner faint ticks */
+        repeating-conic-gradient(
+          from -90deg,
+          rgba(57,255,20,.45) 0deg .6deg,
+          transparent .6deg 10deg
+        );
+      -webkit-mask:
+        radial-gradient(circle at center, transparent 0 58%, #000 59% 63%, transparent 64% 100%);
+              mask:
+        radial-gradient(circle at center, transparent 0 58%, #000 59% 63%, transparent 64% 100%);
+      filter: blur(.3px);
+    }
 
-/* REAL radar sweep: thin bright edge + soft trail */
-.radar{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  mix-blend-mode:screen;
-}
+    /* BACKGROUND “SPECKLE BLIPS” (subtle circles throughout) */
+    .speckle{
+      position:absolute;
+      inset:0;
+      border-radius:50%;
+      opacity:var(--speckleOpacity);
+      background:
+        radial-gradient(circle at 18% 22%, rgba(57,255,20,.22) 0 2px, transparent 3px),
+        radial-gradient(circle at 30% 68%, rgba(57,255,20,.18) 0 1.5px, transparent 3px),
+        radial-gradient(circle at 44% 34%, rgba(57,255,20,.16) 0 1.2px, transparent 3px),
+        radial-gradient(circle at 62% 58%, rgba(57,255,20,.20) 0 1.8px, transparent 3px),
+        radial-gradient(circle at 74% 28%, rgba(57,255,20,.14) 0 1.3px, transparent 3px),
+        radial-gradient(circle at 78% 76%, rgba(57,255,20,.18) 0 1.6px, transparent 3px),
+        radial-gradient(circle at 54% 82%, rgba(57,255,20,.12) 0 1.1px, transparent 3px),
+        radial-gradient(circle at 22% 82%, rgba(57,255,20,.14) 0 1.2px, transparent 3px),
+        radial-gradient(circle at 52% 16%, rgba(57,255,20,.12) 0 1.1px, transparent 3px),
+        radial-gradient(circle at 88% 44%, rgba(57,255,20,.16) 0 1.4px, transparent 3px);
+      filter: blur(.15px);
+    }
 
-.radar::before{
-  content:"";
+    /* SWEEP (cleaner, more radar) */
+    .sweep{
+      position:absolute;
+      inset:-35%;
+      left:50%;
+      top:50%;
+      width:170vmax;
+      height:170vmax;
+      transform:translate(-50%,-50%);
+      border-radius:50%;
+      background:conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(57,255,20,.45) 10deg,
+        rgba(57,255,20,.22) 18deg,
+        transparent 26deg
+      );
+      mix-blend-mode:screen;
+      opacity:var(--sweepOpacity);
+      animation:sweep 7.2s linear infinite;
+      filter:blur(1px);
+    }
+
+    @keyframes sweep{
+      from{ transform:translate(-50%,-50%) rotate(0deg); }
+      to{ transform:translate(-50%,-50%) rotate(360deg); }
+    }
+
+/* PERSISTENCE TRAIL (afterglow behind the sweep) */
+.sweepTrail{
   position:absolute;
-  width:150vmax;
-  height:150vmax;
+  inset:-35%;
   left:50%;
   top:50%;
+  width:170vmax;
+  height:170vmax;
   transform:translate(-50%,-50%);
-  /* trail + leading edge */
+  border-radius:50%;
   background:conic-gradient(
     from 0deg,
-    rgba(57,255,20,0.00) 0deg,
-    rgba(57,255,20,0.04) 12deg,
-    rgba(57,255,20,0.10) 18deg,
-    rgba(57,255,20,0.22) 22deg,
-    rgba(57,255,20,0.55) 24deg,  /* leading edge */
-    rgba(57,255,20,0.00) 26deg,
-    transparent 360deg
+    rgba(57,255,20,.18) 0deg,
+    rgba(57,255,20,.10) 22deg,
+    rgba(57,255,20,.05) 45deg,
+    transparent 70deg
   );
+  mix-blend-mode:screen;
+  opacity:.10;
+  animation:sweep 7.2s linear infinite;
+  filter: blur(2.2px);
+}
+
+/* Optional: adds “glass” vignette so the circle feels like a scope */
+.scopeGlass{
+  position:absolute;
+  inset:-2%;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 62%, rgba(0,0,0,.25) 80%, rgba(0,0,0,.65) 100%),
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,.06), transparent 45%);
   opacity:.55;
-  filter: blur(0.8px);
-  animation:sweep 6.8s linear infinite;
-}
-
-@keyframes sweep{
-  from{ transform:translate(-50%,-50%) rotate(0deg); }
-  to{ transform:translate(-50%,-50%) rotate(360deg); }
-}
-
-/* faint scanlines */
-.scanlines{
-  position:fixed;
-  inset:0;
   pointer-events:none;
-  opacity:.06;
-  background:repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,.05),
-    rgba(255,255,255,.05) 1px,
-    transparent 1px,
-    transparent 7px
-  );
-  mix-blend-mode:overlay;
 }
+    
+    /* ============ CONTENT ============ */
+    .wrapper{
+      width:min(920px, 92vw);
+      padding:44px 18px;
+      position:relative;
+      z-index:2;
+      animation:fadeUp .9s ease-out both;
+    }
 
-/* center content */
-.wrapper{
-  position:relative;
-  z-index:2;
-  padding:44px 18px;
-  width:min(920px, 92vw);
-  animation: fadeUp .9s ease-out both;
-}
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(14px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
 
-@keyframes fadeUp{
-  from{ opacity:0; transform: translateY(14px); }
-  to{ opacity:1; transform: translateY(0); }
-}
+    .logo{ display:flex; justify-content:center; }
 
-.logo{
-  display:flex;
-  justify-content:center;
-}
+    .logo img{
+      width:min(520px, 86vw);
+      height:auto;
+      filter:
+        drop-shadow(0 0 10px rgba(57,255,20,.55))
+        drop-shadow(0 0 30px rgba(57,255,20,.25));
+      animation:glow 2.8s ease-in-out infinite;
+      transition:transform .25s ease, filter .25s ease;
+    }
 
-.logo img{
-  width:min(520px, 86vw);
-  height:auto;
-  filter:
-    drop-shadow(0 0 12px rgba(57,255,20,.60))
-    drop-shadow(0 0 44px rgba(57,255,20,.30));
-  animation: glow 3s ease-in-out infinite;
-}
+    .logo img:hover{
+      transform: translateY(-2px) scale(1.01);
+      filter:
+        drop-shadow(0 0 16px rgba(57,255,20,.85))
+        drop-shadow(0 0 44px rgba(57,255,20,.38));
+    }
 
-@keyframes glow{
-  0%,100%{
-    filter:
-      drop-shadow(0 0 10px rgba(57,255,20,.52))
-      drop-shadow(0 0 38px rgba(57,255,20,.26));
-  }
-  50%{
-    filter:
-      drop-shadow(0 0 16px rgba(57,255,20,.82))
-      drop-shadow(0 0 58px rgba(57,255,20,.36));
-  }
-}
+    @keyframes glow{
+      0%,100%{
+        filter:
+          drop-shadow(0 0 10px rgba(57,255,20,.45))
+          drop-shadow(0 0 26px rgba(57,255,20,.22));
+      }
+      50%{
+        filter:
+          drop-shadow(0 0 14px rgba(57,255,20,.70))
+          drop-shadow(0 0 36px rgba(57,255,20,.32));
+      }
+    }
 
-.services{
-  margin-top:34px;
-  font-weight:600;
-  letter-spacing:2px;
-  line-height:1.9;
-  font-size: clamp(18px, 2.2vw, 22px);
-  text-transform: uppercase;
-}
+    .services{
+      margin-top:34px;
+      font-weight:600;
+      letter-spacing:2px;
+      line-height:1.9;
+      font-size: clamp(18px, 2.2vw, 22px);
+      text-transform: uppercase;
+    }
 
-.divider{
-  width:min(520px, 78vw);
-  height:1px;
-  margin:28px auto 20px;
-  background: linear-gradient(90deg, transparent, rgba(57,255,20,.85), transparent);
-  opacity:.95;
-}
+    .divider{
+      width:min(520px, 78vw);
+      height:1px;
+      margin:28px auto 20px;
+      background: linear-gradient(90deg, transparent, rgba(57,255,20,.75), transparent);
+      opacity:.95;
+    }
 
-.coming{
-  font-weight:800;
-  letter-spacing:6px;
-  font-size: clamp(16px, 2vw, 18px);
-  color: var(--lime);
-  text-shadow: 0 0 12px rgba(57,255,20,.75);
-  text-transform: uppercase;
-}
+    .coming{
+      font-weight:800;
+      letter-spacing:6px;
+      font-size: clamp(16px, 2vw, 18px);
+      color: var(--lime);
+      text-shadow: 0 0 10px rgba(57,255,20,.55);
+      text-transform: uppercase;
+    }
 
-/* reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .wrapper, .logo img, .radar::before, .blips{ animation:none !important; }
-}
-</style>
+    .contact{
+      margin-top:16px;
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    a{
+      color: var(--muted);
+      text-decoration:none;
+      border-bottom:1px solid rgba(255,255,255,.2);
+      padding-bottom:2px;
+    }
+
+    a:hover{ color: var(--white); border-bottom-color: rgba(57,255,20,.55); }
+
+    @media (prefers-reduced-motion: reduce){
+      .wrapper, .logo img, .sweep{ animation:none !important; }
+    }
+  </style>
 </head>
 
 <body>
   <div class="bg"></div>
-  <div class="rings"></div>
-  <div class="bearingRing"></div>
-  <div class="centerDot"></div>
-  <div class="blips"></div>
-  <div class="radar"></div>
-  <div class="scanlines"></div>
+
+  <!-- Radar layer (no square grid, no crosshair) -->
+  <div class="radarWrap" aria-hidden="true">
+    <div class="scope">
+      <div class="rings"></div>
+      <div class="outerRing"></div>
+      <div class="ticks"></div>
+      <div class="ticksInner"></div>
+      <div class="speckle"></div>
+      <div class="sweepTrail"></div>
+      <div class="sweep"></div>
+      <div class="scopeGlass"></div>
+    </div>
+  </div>
+
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
 
   <main class="wrapper">
     <div class="logo">
@@ -307,6 +391,10 @@ black 96.3%);
     <div class="divider"></div>
 
     <div class="coming">COMING SOON</div>
+
+    <div class="contact">
+      Contact: <a href="mailto:hello@limadeltaaerial.com">hello@limadeltaaerial.com</a>
+    </div>
   </main>
 </body>
 </html>
