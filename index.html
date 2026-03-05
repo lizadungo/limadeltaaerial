@@ -84,6 +84,41 @@ body{
   filter: drop-shadow(0 0 18px rgba(57,255,20,.28));
 }
 
+/* outer radar ring with bearing ticks */
+
+.bearingRing{
+position:fixed;
+inset:0;
+pointer-events:none;
+display:flex;
+align-items:center;
+justify-content:center;
+mix-blend-mode:screen;
+opacity:.45;
+}
+
+.bearingRing::before{
+content:"";
+width:min(112vmin,1200px);
+height:min(112vmin,1200px);
+border-radius:50%;
+
+/* outer circle */
+box-shadow:0 0 0 2px rgba(57,255,20,.45);
+
+/* tick marks */
+background:
+repeating-conic-gradient(
+rgba(57,255,20,.55) 0deg 1deg,
+transparent 1deg 15deg
+);
+
+mask:
+radial-gradient(circle,
+transparent 96%,
+black 96.3%);
+}
+  
 /* subtle center dot (helps radar realism without crosshair lines) */
 .centerDot{
   position:fixed;
@@ -252,6 +287,7 @@ body{
 <body>
   <div class="bg"></div>
   <div class="rings"></div>
+  <div class="bearingRing"></div>
   <div class="centerDot"></div>
   <div class="blips"></div>
   <div class="radar"></div>
