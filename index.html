@@ -1,46 +1,165 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-<title>Lima Delta Aerial</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<title>Lima Delta Aerial | Drone Services</title>
+
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
 
-body{
-background:black;
-margin:0;
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-font-family:'Montserrat', sans-serif;
-color:white;
-text-align:center;
+:root{
+--lime:#39ff14;
+--black:#000;
+--white:#fff;
 }
 
-.logo img{
-width:500px;
-max-width:90%;
-filter: drop-shadow(0 0 12px #39ff14);
+body{
+margin:0;
+height:100vh;
+background:var(--black);
+color:var(--white);
+font-family:'Montserrat', sans-serif;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+overflow:hidden;
 }
+
+/* subtle radar grid */
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at center, rgba(57,255,20,0.06) 0%, transparent 70%),
+repeating-linear-gradient(
+0deg,
+rgba(255,255,255,0.05),
+rgba(255,255,255,0.05) 1px,
+transparent 1px,
+transparent 6px
+);
+pointer-events:none;
+}
+
+/* radar sweep */
+
+.radar{
+position:fixed;
+inset:0;
+pointer-events:none;
+overflow:hidden;
+}
+
+.radar::before{
+content:"";
+position:absolute;
+width:140vmax;
+height:140vmax;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+background:conic-gradient(
+from 0deg,
+transparent 0deg,
+rgba(57,255,20,.18) 12deg,
+transparent 24deg
+);
+mix-blend-mode:screen;
+opacity:.08;
+animation:sweep 8s linear infinite;
+filter:blur(1px);
+}
+
+@keyframes sweep{
+from{ transform:translate(-50%,-50%) rotate(0deg); }
+to{ transform:translate(-50%,-50%) rotate(360deg); }
+}
+
+/* page wrapper */
+
+.wrapper{
+max-width:900px;
+padding:40px;
+animation:fadeUp 1s ease;
+}
+
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* logo */
+
+.logo img{
+width:420px;
+max-width:85%;
+filter:
+drop-shadow(0 0 10px rgba(57,255,20,.6))
+drop-shadow(0 0 30px rgba(57,255,20,.25));
+animation:glow 3s ease-in-out infinite;
+}
+
+@keyframes glow{
+0%,100%{
+filter:
+drop-shadow(0 0 10px rgba(57,255,20,.45))
+drop-shadow(0 0 26px rgba(57,255,20,.2));
+}
+
+50%{
+filter:
+drop-shadow(0 0 14px rgba(57,255,20,.75))
+drop-shadow(0 0 36px rgba(57,255,20,.35));
+}
+}
+
+/* services */
 
 .services{
 margin-top:35px;
+font-weight:600;
+letter-spacing:2px;
 line-height:1.9;
 font-size:22px;
-letter-spacing:2px;
-font-weight:600;
+text-transform:uppercase;
 }
 
+/* divider */
+
+.divider{
+width:450px;
+max-width:80%;
+height:1px;
+margin:30px auto;
+background:linear-gradient(90deg,transparent,var(--lime),transparent);
+}
+
+/* coming soon */
+
 .coming{
-margin-top:35px;
+font-weight:800;
+letter-spacing:6px;
 font-size:18px;
-letter-spacing:4px;
-color:#39ff14;
-text-shadow:0 0 8px #39ff14;
+color:var(--lime);
+text-shadow:0 0 10px rgba(57,255,20,.6);
+}
+
+/* footer */
+
+.footer{
+margin-top:15px;
+font-size:13px;
+letter-spacing:2px;
+opacity:.7;
 }
 
 </style>
@@ -49,8 +168,12 @@ text-shadow:0 0 8px #39ff14;
 
 <body>
 
+<div class="radar"></div>
+
+<div class="wrapper">
+
 <div class="logo">
-<img src="logo.png">
+<img src="logo.png" alt="Lima Delta Aerial">
 </div>
 
 <div class="services">
@@ -59,8 +182,16 @@ Construction Documentation<br>
 Drone Repair
 </div>
 
+<div class="divider"></div>
+
 <div class="coming">
 COMING SOON
+</div>
+
+<div class="footer">
+limadeltaaerial.com
+</div>
+
 </div>
 
 </body>
