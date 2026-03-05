@@ -1,188 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lima Delta Aerial</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<title>Lima Delta Aerial | Drone Services</title>
 
-  <style>
-    :root{
-      --lime:#39ff14;
-      --bg:#000;
-      --white:#fff;
-      --muted:rgba(255,255,255,.72);
-    }
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
 
-    *{ box-sizing:border-box; }
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
-    body{
-      margin:0;
-      min-height:100vh;
-      background: var(--bg);
-      color: var(--white);
-      font-family: 'Montserrat', sans-serif;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
+<style>
 
-    /* subtle “hangar haze” */
-    .bg{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(900px 500px at 50% 35%, rgba(57,255,20,.08), transparent 60%),
-        radial-gradient(700px 500px at 20% 75%, rgba(57,255,20,.05), transparent 65%),
-        radial-gradient(700px 500px at 80% 80%, rgba(57,255,20,.04), transparent 65%),
-        linear-gradient(180deg, rgba(255,255,255,.03), transparent 40%);
-      filter: blur(0px);
-    }
+:root{
+--lime:#39ff14;
+--black:#000;
+--white:#fff;
+}
 
-    /* faint scanlines for “avionics” vibe */
-    .scanlines{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:.10;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,.06),
-        rgba(255,255,255,.06) 1px,
-        transparent 1px,
-        transparent 6px
-      );
-      mix-blend-mode: overlay;
-    }
+body{
+margin:0;
+height:100vh;
+background:var(--black);
+color:var(--white);
+font-family:'Montserrat', sans-serif;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+overflow:hidden;
+}
 
-    .wrap{
-      width:min(860px, 92vw);
-      text-align:center;
-      padding:48px 18px;
-      position:relative;
-      animation: fadeUp .9s ease-out both;
-    }
+/* subtle radar grid background */
 
-    @keyframes fadeUp{
-      from{ opacity:0; transform: translateY(14px); }
-      to{ opacity:1; transform: translateY(0); }
-    }
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(circle at center, rgba(57,255,20,0.06) 0%, transparent 70%),
+repeating-linear-gradient(
+0deg,
+rgba(255,255,255,0.05),
+rgba(255,255,255,0.05) 1px,
+transparent 1px,
+transparent 6px
+);
+pointer-events:none;
+}
 
-    .logo{
-      display:flex;
-      justify-content:center;
-    }
+/* container */
 
-    .logo img{
-      width:min(520px, 86vw);
-      height:auto;
-      filter:
-        drop-shadow(0 0 10px rgba(57,255,20,.55))
-        drop-shadow(0 0 28px rgba(57,255,20,.25));
-      animation: glow 2.8s ease-in-out infinite;
-    }
+.wrapper{
+max-width:900px;
+padding:40px;
+animation:fadeUp 1s ease;
+}
 
-    @keyframes glow{
-      0%,100%{
-        filter:
-          drop-shadow(0 0 10px rgba(57,255,20,.45))
-          drop-shadow(0 0 26px rgba(57,255,20,.22));
-      }
-      50%{
-        filter:
-          drop-shadow(0 0 14px rgba(57,255,20,.70))
-          drop-shadow(0 0 34px rgba(57,255,20,.30));
-      }
-    }
+@keyframes fadeUp{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
+}
 
-    .services{
-      margin-top:34px;
-      font-weight:600;
-      letter-spacing:2px;
-      line-height:1.9;
-      font-size: clamp(18px, 2.2vw, 22px);
-      color: var(--white);
-      text-transform: uppercase;
-    }
+/* logo */
 
-    .divider{
-      width:min(520px, 78vw);
-      height:1px;
-      margin:28px auto 22px;
-      background: linear-gradient(90deg, transparent, rgba(57,255,20,.65), transparent);
-      opacity:.9;
-    }
+.logo img{
+width:420px;
+max-width:85%;
+filter:
+drop-shadow(0 0 10px rgba(57,255,20,.6))
+drop-shadow(0 0 30px rgba(57,255,20,.25));
+animation:glow 3s ease-in-out infinite;
+}
 
-    .coming{
-      margin-top:0;
-      font-weight:800;
-      letter-spacing:6px;
-      font-size: clamp(16px, 2vw, 18px);
-      color: var(--lime);
-      text-shadow: 0 0 10px rgba(57,255,20,.55);
-      text-transform: uppercase;
-    }
+@keyframes glow{
+0%,100%{
+filter:
+drop-shadow(0 0 10px rgba(57,255,20,.45))
+drop-shadow(0 0 26px rgba(57,255,20,.2));
+}
 
-    .tag{
-      margin-top:14px;
-      font-size: 13px;
-      letter-spacing: 2px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
+50%{
+filter:
+drop-shadow(0 0 14px rgba(57,255,20,.75))
+drop-shadow(0 0 36px rgba(57,255,20,.35));
+}
+}
 
-    /* optional: tiny animated “beacon” dot */
-    .beacon{
-      display:inline-block;
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background: var(--lime);
-      margin-right:10px;
-      box-shadow: 0 0 10px rgba(57,255,20,.8);
-      animation: pulse 1.6s ease-in-out infinite;
-      vertical-align: middle;
-    }
-    @keyframes pulse{
-      0%,100%{ transform: scale(1); opacity:.9; }
-      50%{ transform: scale(1.6); opacity:.35; }
-    }
+/* services */
 
-    /* respect reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      .wrap, .logo img, .beacon{ animation:none !important; }
-    }
-  </style>
+.services{
+margin-top:35px;
+font-weight:600;
+letter-spacing:2px;
+line-height:1.9;
+font-size:22px;
+text-transform:uppercase;
+}
+
+/* divider */
+
+.divider{
+width:450px;
+max-width:80%;
+height:1px;
+margin:30px auto;
+background:linear-gradient(90deg,transparent,var(--lime),transparent);
+}
+
+/* coming soon */
+
+.coming{
+font-weight:800;
+letter-spacing:6px;
+font-size:18px;
+color:var(--lime);
+text-shadow:0 0 10px rgba(57,255,20,.6);
+}
+
+/* footer */
+
+.footer{
+margin-top:15px;
+font-size:13px;
+letter-spacing:2px;
+opacity:.7;
+}
+
+</style>
+
 </head>
 
 <body>
-  <div class="bg"></div>
-  <div class="scanlines"></div>
 
-  <main class="wrap">
-    <!-- Make sure your repo file is named exactly: logo.png -->
-    <div class="logo">
-      <img src="logo.png" alt="Lima Delta Aerial Logo">
-    </div>
+<div class="wrapper">
 
-    <div class="services">
-      Drone Services<br>
-      Construction Documentation<br>
-      Drone Repair
-    </div>
+<div class="logo">
+<img src="logo.png" alt="Lima Delta Aerial">
+</div>
 
-    <div class="divider"></div>
+<div class="services">
+Drone Services<br>
+Construction Documentation<br>
+Drone Repair
+</div>
 
-    <div class="coming">
-      <span class="beacon"></span>Coming Soon
-    </div>
+<div class="divider"></div>
 
-    <div class="tag">
-      limadeltaaerial.com
-    </div>
-  </main>
+<div class="coming">
+COMING SOON
+</div>
+
+<div class="footer">
+limadeltaaerial.com
+</div>
+
+</div>
+
 </body>
+
 </html>
