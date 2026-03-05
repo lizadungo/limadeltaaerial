@@ -137,37 +137,6 @@
       mask: radial-gradient(circle, transparent 95.7%, black 96.0%);
     }
 
-  /* ===== STATEN ISLAND TERRAIN OVERLAY ===== */
-.terrain{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:.18;                 /* was .10 — bumped so you can see it */
-  mix-blend-mode:normal;       /* was screen — normal is more reliable */
-}
-
-.terrain::before{
-  content:"";
-  width:min(96vmin, 1180px);
-  height:min(96vmin, 1180px);
-  border-radius:50%;
-
-  background: url("staten-island-radar-terrain.png") center/contain no-repeat;
-
-  /* Make the PNG read as “radar data” even when faint */
-  filter:
-    brightness(.95)
-    contrast(1.15)
-    drop-shadow(0 0 16px rgba(57,255,20,.22));
-
-  /* Soft edge fade */
-  -webkit-mask: radial-gradient(circle at center, rgba(0,0,0,1) 0 68%, rgba(0,0,0,.55) 80%, rgba(0,0,0,0) 92%);
-  mask: radial-gradient(circle at center, rgba(0,0,0,1) 0 68%, rgba(0,0,0,.55) 80%, rgba(0,0,0,0) 92%);
-}
     /* extra background circles / clutter */
     .clutter{
       position:fixed;
@@ -227,7 +196,7 @@
       to{ transform:translate(-50%,-50%) rotate(360deg); }
     }
 
-    /* ===== COORDINATE LABELS (NEW) ===== */
+    /* ===== COORDINATE LABELS ===== */
     .coords{
       position:fixed;
       inset:0;
@@ -302,22 +271,32 @@
       box-shadow:0 0 0 rgba(57,255,20,0);
       transform: translate(-50%,-50%);
       opacity:.25;
-      transition: opacity .25s ease;
+      transition: opacity .25s ease, background-color .25s ease;
     }
 
+    /* ping anim handles the bright moment + returns to dim */
     .blip.ping{
-      opacity:1;
-      background:rgba(57,255,20,.95);
       animation: blipPing .9s ease-out;
     }
 
     @keyframes blipPing{
       0%{
+        opacity:1;
+        background:rgba(57,255,20,.95);
         box-shadow:
           0 0 0 0 rgba(57,255,20,.65),
           0 0 18px 2px rgba(57,255,20,.55);
       }
+      55%{
+        opacity:.70;
+        background:rgba(57,255,20,.55);
+        box-shadow:
+          0 0 0 14px rgba(57,255,20,.12),
+          0 0 10px 1px rgba(57,255,20,.25);
+      }
       100%{
+        opacity:.25; /* back to baseline */
+        background:rgba(57,255,20,.25);
         box-shadow:
           0 0 0 22px rgba(57,255,20,0),
           0 0 6px 0 rgba(57,255,20,0);
@@ -418,6 +397,7 @@
     /* reduced motion */
     @media (prefers-reduced-motion: reduce){
       .radarBeam, .clutter{ animation:none !important; }
+      .blip.ping{ animation:none !important; }
     }
 
     /* MOBILE LAYOUT FIX */
@@ -466,14 +446,12 @@
 <body>
   <div class="rings"></div>
   <div class="bearingRing"></div>
-  <div class="terrain"></div>
   <div class="clutter"></div>
 
   <div class="radar">
     <div class="radarBeam" id="radarBeam"></div>
   </div>
 
-  <!-- COORDS (NEW) -->
   <div class="coords">
     <div class="coordsField">
       <div class="coord n">000</div>
@@ -574,7 +552,7 @@
             if(now - last > cooldownMs){
               lastHit.set(b, now);
               b.classList.remove('ping');
-              void b.offsetWidth;
+              void b.offsetWidth; /* restart animation */
               b.classList.add('ping');
             }
           }
