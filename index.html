@@ -32,7 +32,7 @@ text-align:center;
 overflow:hidden;
 }
 
-/* subtle radar grid background */
+/* subtle radar grid */
 
 body::before{
 content:"";
@@ -50,7 +50,41 @@ transparent 6px
 pointer-events:none;
 }
 
-/* container */
+/* radar sweep */
+
+.radar{
+position:fixed;
+inset:0;
+pointer-events:none;
+overflow:hidden;
+}
+
+.radar::before{
+content:"";
+position:absolute;
+width:140vmax;
+height:140vmax;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+background:conic-gradient(
+from 0deg,
+transparent 0deg,
+rgba(57,255,20,.18) 12deg,
+transparent 24deg
+);
+mix-blend-mode:screen;
+opacity:.08;
+animation:sweep 8s linear infinite;
+filter:blur(1px);
+}
+
+@keyframes sweep{
+from{ transform:translate(-50%,-50%) rotate(0deg); }
+to{ transform:translate(-50%,-50%) rotate(360deg); }
+}
+
+/* page wrapper */
 
 .wrapper{
 max-width:900px;
@@ -133,6 +167,8 @@ opacity:.7;
 </head>
 
 <body>
+
+<div class="radar"></div>
 
 <div class="wrapper">
 
