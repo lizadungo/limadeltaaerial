@@ -1,378 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>Lima Delta Aerial | Drone Services</title>
+  <title>Lima Delta Aerial | Drone Services</title>
 
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon.png" />
 
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Open Graph / Social Preview -->
+  <meta property="og:title" content="Lima Delta Aerial | Drone Services" />
+  <meta property="og:description" content="Drone Services • Construction Documentation • Drone Repair" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://limadeltaaerial.com/" />
+  <meta property="og:image" content="https://limadeltaaerial.com/preview.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
-<style>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lima Delta Aerial | Drone Services" />
+  <meta name="twitter:description" content="Drone Services • Construction Documentation • Drone Repair" />
+  <meta name="twitter:image" content="https://limadeltaaerial.com/preview.png" />
 
-:root{
---lime:#39ff14;
---black:#000;
---white:#fff;
-}
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
-*{ box-sizing:border-box; }
+  <style>
+    :root{
+      --lime:#39ff14;
+      --black:#000;
+      --white:#fff;
+    }
 
-body{
-margin:0;
-min-height:100vh;
-background:var(--black);
-color:var(--white);
-font-family:'Montserrat', sans-serif;
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-overflow-x:hidden;
-overflow-y:auto;
-}
+    *{ box-sizing:border-box; }
 
-/* RADAR BACKGROUND (polar, no square grid) */
-body::before{
-content:"";
-position:fixed;
-inset:0;
-pointer-events:none;
-background:
-/* gentle glow */
-radial-gradient(circle at center, rgba(57,255,20,0.10) 0%, transparent 70%),
-/* faint scanlines texture */
-repeating-linear-gradient(
-0deg,
-rgba(255,255,255,0.04),
-rgba(255,255,255,0.04) 1px,
-transparent 1px,
-transparent 7px
-);
-}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:var(--black);
+      color:var(--white);
+      font-family:'Montserrat', sans-serif;
 
-/* range rings behind everything */
-.rings{
-position:fixed;
-inset:0;
-pointer-events:none;
-display:flex;
-align-items:center;
-justify-content:center;
-opacity:.35;
-mix-blend-mode:screen;
-}
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
 
-.rings::before{
-content:"";
-width:min(108vmin, 1180px);
-height:min(108vmin, 1180px);
-border-radius:50%;
-background:
-radial-gradient(circle at center,
-transparent 0%,
-transparent 20%,
-rgba(57,255,20,.30) 20.2%,
-transparent 20.6%,
+      overflow-x:hidden;
+      overflow-y:auto;
+      padding: 24px 16px;
+    }
 
-transparent 40%,
-rgba(57,255,20,.26) 40.2%,
-transparent 40.6%,
+    /* RADAR BACKGROUND (polar, no square grid) */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at center, rgba(57,255,20,0.10) 0%, transparent 70%),
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,0.04),
+          rgba(255,255,255,0.04) 1px,
+          transparent 1px,
+          transparent 7px
+        );
+      z-index:0;
+    }
 
-transparent 60%,
-rgba(57,255,20,.22) 60.2%,
-transparent 60.6%,
+    /* range rings behind everything */
+    .rings{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity:.35;
+      mix-blend-mode:screen;
+      z-index:0;
+    }
 
-transparent 80%,
-rgba(57,255,20,.18) 80.2%,
-transparent 80.6%
-);
-filter: drop-shadow(0 0 14px rgba(57,255,20,.22));
-}
+    .rings::before{
+      content:"";
+      width:min(108vmin, 1180px);
+      height:min(108vmin, 1180px);
+      border-radius:50%;
+      background:
+        radial-gradient(circle at center,
+          transparent 0%,
+          transparent 20%,
+          rgba(57,255,20,.30) 20.2%,
+          transparent 20.6%,
 
-/* outer bearing ring + tickmarks */
-.bearingRing{
-position:fixed;
-inset:0;
-pointer-events:none;
-display:flex;
-align-items:center;
-justify-content:center;
-opacity:.42;
-mix-blend-mode:screen;
-}
+          transparent 40%,
+          rgba(57,255,20,.26) 40.2%,
+          transparent 40.6%,
 
-.bearingRing::before{
-content:"";
-width:min(112vmin, 1220px);
-height:min(112vmin, 1220px);
-border-radius:50%;
-/* outer circle */
-box-shadow:0 0 0 2px rgba(57,255,20,.35);
-/* ticks every 15 degrees */
-background:repeating-conic-gradient(
-rgba(57,255,20,.55) 0deg 1deg,
-transparent 1deg 15deg
-);
-/* show ticks only as a thin ring near the edge */
-mask: radial-gradient(circle, transparent 95.7%, black 96.0%);
-}
+          transparent 60%,
+          rgba(57,255,20,.22) 60.2%,
+          transparent 60.6%,
 
-/* extra background circles / clutter */
-.clutter{
-position:fixed;
-inset:0;
-pointer-events:none;
-opacity:.10; /* raise to .16 if you want more */
-mix-blend-mode:screen;
-filter: blur(.15px);
-background:
-radial-gradient(circle, rgba(57,255,20,.55) 0 2px, transparent 3px) 12% 18%/420px 420px,
-radial-gradient(circle, rgba(57,255,20,.45) 0 2px, transparent 3px) 74% 24%/520px 520px,
-radial-gradient(circle, rgba(57,255,20,.50) 0 2px, transparent 3px) 46% 68%/480px 480px,
-radial-gradient(circle, rgba(57,255,20,.38) 0 2px, transparent 3px) 86% 78%/560px 560px,
-radial-gradient(circle, rgba(57,255,20,.42) 0 2px, transparent 3px) 22% 82%/600px 600px;
-animation: clutterDrift 26s linear infinite;
-}
+          transparent 80%,
+          rgba(57,255,20,.18) 80.2%,
+          transparent 80.6%
+        );
+      filter: drop-shadow(0 0 14px rgba(57,255,20,.22));
+    }
 
-@keyframes clutterDrift{
-from{ transform: translate3d(0,0,0); }
-to{ transform: translate3d(90px,-70px,0); }
-}
+    /* outer bearing ring + tickmarks */
+    .bearingRing{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity:.42;
+      mix-blend-mode:screen;
+      z-index:0;
+    }
 
-/* radar sweep */
-.radar{
-position:fixed;
-inset:0;
-pointer-events:none;
-overflow:hidden;
-mix-blend-mode:screen;
-}
+    .bearingRing::before{
+      content:"";
+      width:min(112vmin, 1220px);
+      height:min(112vmin, 1220px);
+      border-radius:50%;
+      box-shadow:0 0 0 2px rgba(57,255,20,.35);
+      background:repeating-conic-gradient(
+        rgba(57,255,20,.55) 0deg 1deg,
+        transparent 1deg 15deg
+      );
+      mask: radial-gradient(circle, transparent 95.7%, black 96.0%);
+    }
 
-.radar::before{
-.radar{
-   ...
-}
+    /* extra background circles / clutter */
+    .clutter{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.10;
+      mix-blend-mode:screen;
+      filter: blur(.15px);
+      background:
+        radial-gradient(circle, rgba(57,255,20,.55) 0 2px, transparent 3px) 12% 18%/420px 420px,
+        radial-gradient(circle, rgba(57,255,20,.45) 0 2px, transparent 3px) 74% 24%/520px 520px,
+        radial-gradient(circle, rgba(57,255,20,.50) 0 2px, transparent 3px) 46% 68%/480px 480px,
+        radial-gradient(circle, rgba(57,255,20,.38) 0 2px, transparent 3px) 86% 78%/560px 560px,
+        radial-gradient(circle, rgba(57,255,20,.42) 0 2px, transparent 3px) 22% 82%/600px 600px;
+      animation: clutterDrift 26s linear infinite;
+      z-index:0;
+    }
 
-.radar::before{
-   ...
-}
+    @keyframes clutterDrift{
+      from{ transform: translate3d(0,0,0); }
+      to{ transform: translate3d(90px,-70px,0); }
+    }
 
-/* ⬇️ PASTE THE BLIP CODE RIGHT HERE */
+    /* radar sweep */
+    .radar{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      mix-blend-mode:screen;
+      z-index:0;
+    }
 
-.blips{
-   ...
-}
+    /* IMPORTANT: keep a real element we can read angle from */
+    .radarBeam{
+      position:absolute;
+      width:140vmax;
+      height:140vmax;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%) rotate(0deg);
+      transform-origin:center;
+      background:conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(57,255,20,.06) 10deg,
+        rgba(57,255,20,.16) 16deg,
+        rgba(57,255,20,.40) 20deg,
+        transparent 26deg
+      );
+      opacity:.42;
+      filter:blur(1px);
+      animation:sweep 8s linear infinite;
+    }
 
-.blips::before{
-   ...
-}
+    @keyframes sweep{
+      from{ transform:translate(-50%,-50%) rotate(0deg); }
+      to{ transform:translate(-50%,-50%) rotate(360deg); }
+    }
 
-@keyframes blipPulse{
-   ...
-}
-content:"";
-position:absolute;
-width:140vmax;
-height:140vmax;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-background:conic-gradient(
-from 0deg,
-transparent 0deg,
-rgba(57,255,20,.06) 10deg,
-rgba(57,255,20,.16) 16deg,
-rgba(57,255,20,.40) 20deg,  /* leading edge */
-transparent 26deg
-);
-opacity:.42;
-animation:sweep 8s linear infinite;
-filter:blur(1px);
-}
+    /* ===== BLIPS LAYER (NEW) ===== */
+    .blips{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1; /* above background, below wrapper */
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      mix-blend-mode:screen;
+    }
 
-@keyframes sweep{
-from{ transform:translate(-50%,-50%) rotate(0deg); }
-to{ transform:translate(-50%,-50%) rotate(360deg); }
-}
+    /* container matches ring size so blips sit "on" radar */
+    .blipField{
+      position:relative;
+      width:min(108vmin, 1180px);
+      height:min(108vmin, 1180px);
+      border-radius:50%;
+    }
 
-/* page wrapper */
-.wrapper{
-max-width:900px;
-padding:40px;
-animation:fadeUp 1s ease;
-position:relative;
-z-index:2;
-}
+    .blip{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:rgba(57,255,20,.25);
+      box-shadow:0 0 0 rgba(57,255,20,0);
+      transform: translate(-50%,-50%);
+      opacity:.25;
+      transition: opacity .25s ease;
+    }
 
-@keyframes fadeUp{
-from{opacity:0; transform:translateY(20px);}
-to{opacity:1; transform:translateY(0);}
-}
+    /* "ping" state when beam hits */
+    .blip.ping{
+      opacity:1;
+      background:rgba(57,255,20,.95);
+      animation: blipPing .9s ease-out;
+    }
 
-/* logo */
-.logo img{
-width:420px;
-max-width:85%;
-transition: transform .25s ease, filter .25s ease;
-filter:
-drop-shadow(0 0 10px rgba(57,255,20,.6))
-drop-shadow(0 0 30px rgba(57,255,20,.25));
-animation:glow 3s ease-in-out infinite;
-}
+    @keyframes blipPing{
+      0%{
+        box-shadow:
+          0 0 0 0 rgba(57,255,20,.65),
+          0 0 18px 2px rgba(57,255,20,.55);
+      }
+      100%{
+        box-shadow:
+          0 0 0 22px rgba(57,255,20,0),
+          0 0 6px 0 rgba(57,255,20,0);
+      }
+    }
 
-.logo img:hover{
-transform: translateY(-2px) scale(1.02);
-filter:
-drop-shadow(0 0 18px rgba(57,255,20,.9))
-drop-shadow(0 0 60px rgba(57,255,20,.35));
-}
+    /* page wrapper */
+    .wrapper{
+      max-width:900px;
+      width:100%;
+      padding:40px;
+      animation:fadeUp 1s ease;
+      position:relative;
+      z-index:2;
+    }
 
-@keyframes glow{
-0%,100%{
-filter:
-drop-shadow(0 0 10px rgba(57,255,20,.45))
-drop-shadow(0 0 26px rgba(57,255,20,.2));
-}
-50%{
-filter:
-drop-shadow(0 0 14px rgba(57,255,20,.75))
-drop-shadow(0 0 36px rgba(57,255,20,.35));
-}
-}
+    @keyframes fadeUp{
+      from{opacity:0; transform:translateY(20px);}
+      to{opacity:1; transform:translateY(0);}
+    }
 
-/* services */
-.services{
-margin-top:35px;
-font-weight:600;
-letter-spacing:2px;
-line-height:1.9;
-font-size:22px;
-text-transform:uppercase;
-}
+    /* logo */
+    .logo img{
+      width:420px;
+      max-width:85%;
+      transition: transform .25s ease, filter .25s ease;
+      filter:
+        drop-shadow(0 0 10px rgba(57,255,20,.6))
+        drop-shadow(0 0 30px rgba(57,255,20,.25));
+      animation:glow 3s ease-in-out infinite;
+    }
 
-/* divider */
-.divider{
-width:450px;
-max-width:80%;
-height:1px;
-margin:30px auto;
-background:linear-gradient(90deg,transparent,var(--lime),transparent);
-}
+    .logo img:hover{
+      transform: translateY(-2px) scale(1.02);
+      filter:
+        drop-shadow(0 0 18px rgba(57,255,20,.9))
+        drop-shadow(0 0 60px rgba(57,255,20,.35));
+    }
 
-/* coming soon */
-.coming{
-font-weight:800;
-letter-spacing:6px;
-font-size:18px;
-color:var(--lime);
-text-shadow:0 0 10px rgba(57,255,20,.6);
-}
+    @keyframes glow{
+      0%,100%{
+        filter:
+          drop-shadow(0 0 10px rgba(57,255,20,.45))
+          drop-shadow(0 0 26px rgba(57,255,20,.2));
+      }
+      50%{
+        filter:
+          drop-shadow(0 0 14px rgba(57,255,20,.75))
+          drop-shadow(0 0 36px rgba(57,255,20,.35));
+      }
+    }
 
-/* footer */
-.footer{
-margin-top:15px;
-font-size:13px;
-letter-spacing:2px;
-opacity:.7;
-}
+    /* services */
+    .services{
+      margin-top:35px;
+      font-weight:600;
+      letter-spacing:2px;
+      line-height:1.9;
+      font-size:22px;
+      text-transform:uppercase;
+    }
 
-/* reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .radar::before, .clutter{ animation:none !important; }
-}
-/* reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .radar::before, .clutter{ animation:none !important; }
-}
+    /* divider */
+    .divider{
+      width:450px;
+      max-width:80%;
+      height:1px;
+      margin:30px auto;
+      background:linear-gradient(90deg,transparent,var(--lime),transparent);
+    }
 
-/* MOBILE LAYOUT FIX */
-@media (max-width: 520px){
+    /* coming soon */
+    .coming{
+      font-weight:800;
+      letter-spacing:6px;
+      font-size:18px;
+      color:var(--lime);
+      text-shadow:0 0 10px rgba(57,255,20,.6);
+    }
 
-  body{
-    height:auto;
-    min-height:100svh;
-    padding:22px 14px;
-  }
+    /* footer */
+    .footer{
+      margin-top:14px;
+      font-size:13px;
+      letter-spacing:2px;
+      opacity:.8;
+    }
 
-  .wrapper{
-    padding:22px 10px;
-    max-width:100%;
-  }
+    .footer a{
+      color:var(--lime);
+      text-decoration:none;
+    }
 
-  .logo img{
-    width:min(320px,82vw);
-  }
+    .footer a:hover{
+      text-decoration:underline;
+    }
 
-  .services{
-    margin-top:22px;
-    font-size:clamp(14px,4.2vw,18px);
-    letter-spacing:1.5px;
-    line-height:1.7;
-    padding:0 6px;
-    word-break:break-word;
-  }
+    /* reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .radarBeam, .clutter{ animation:none !important; }
+    }
 
-  .divider{
-    width:min(320px,80vw);
-    margin:22px auto;
-  }
+    /* MOBILE LAYOUT FIX */
+    @media (max-width: 520px){
+      body{
+        padding:22px 14px;
+        min-height:100svh;
+      }
 
-  .coming{
-    font-size:16px;
-    letter-spacing:4px;
-  }
+      .wrapper{
+        padding:22px 10px;
+        max-width:100%;
+      }
 
-  .footer{
-    font-size:12px;
-    letter-spacing:1.5px;
-  }
-}
-</style>
+      .logo img{
+        width:min(320px,82vw);
+      }
 
+      .services{
+        margin-top:22px;
+        font-size:clamp(14px,4.2vw,18px);
+        letter-spacing:1.5px;
+        line-height:1.7;
+        padding:0 6px;
+        word-break:break-word;
+      }
+
+      .divider{
+        width:min(320px,80vw);
+        margin:22px auto;
+      }
+
+      .coming{
+        font-size:16px;
+        letter-spacing:4px;
+      }
+
+      .footer{
+        font-size:12px;
+        letter-spacing:1.5px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="rings"></div>
+  <div class="bearingRing"></div>
+  <div class="clutter"></div>
 
-<div class="rings"></div>
-<div class="bearingRing"></div>
-<div class="clutter"></div>
-<div class="radar"></div>
-<div class="blips"></div>
+  <div class="radar">
+    <div class="radarBeam" id="radarBeam"></div>
+  </div>
 
-<div class="wrapper">
+  <!-- BLIPS (NEW) -->
+  <div class="blips">
+    <div class="blipField" id="blipField">
+      <!-- Add/remove blips here. data-angle degrees, data-r radius (0–1) -->
+      <div class="blip" data-angle="18"  data-r="0.62"></div>
+      <div class="blip" data-angle="71"  data-r="0.38"></div>
+      <div class="blip" data-angle="132" data-r="0.54"></div>
+      <div class="blip" data-angle="205" data-r="0.72"></div>
+      <div class="blip" data-angle="287" data-r="0.44"></div>
+      <div class="blip" data-angle="330" data-r="0.28"></div>
+    </div>
+  </div>
 
-<div class="logo">
-<img src="logo.png" alt="Lima Delta Aerial">
-</div>
+  <div class="wrapper">
+    <div class="logo">
+      <img src="logo.png" alt="Lima Delta Aerial">
+    </div>
 
-<div class="services">
-Drone Services<br>
-Construction Documentation<br>
-Drone Repair
-</div>
+    <div class="services">
+      Drone Services<br>
+      Construction Documentation<br>
+      Drone Repair
+    </div>
 
-<div class="divider"></div>
+    <div class="divider"></div>
 
-<div class="coming">
-COMING SOON
-</div>
+    <div class="coming">COMING SOON</div>
 
-<div class="footer">
-<a href="mailto:hello@limadeltaaerial.com" style="color:#39ff14; text-decoration:none;">
-hello@limadeltaaerial.com
-</a>
-</div>
+    <div class="footer">
+      <a href="mailto:hello@limadeltaaerial.com">hello@limadeltaaerial.com</a>
+    </div>
 
-<div class="footer">
-limadeltaaerial.com
-</div>
+    <div class="footer">
+      <a href="https://limadeltaaerial.com" target="_blank" rel="noopener noreferrer">limadeltaaerial.com</a>
+    </div>
+  </div>
 
-</div>
+  <script>
+    // ===== Blip positioning (polar -> x,y) =====
+    (function initBlips(){
+      const field = document.getElementById('blipField');
+      if(!field) return;
 
+      const blips = Array.from(field.querySelectorAll('.blip'));
+      const size = () => field.getBoundingClientRect().width;
+
+      const place = () => {
+        const radiusPx = size() * 0.5; // field is a circle
+        blips.forEach(b => {
+          const angDeg = parseFloat(b.dataset.angle || "0");
+          const r = Math.max(0, Math.min(1, parseFloat(b.dataset.r || "0.5")));
+
+          // convert: 0deg = up, clockwise
+          const theta = (angDeg - 90) * Math.PI / 180;
+
+          const dist = radiusPx * r;
+          const x = Math.cos(theta) * dist;
+          const y = Math.sin(theta) * dist;
+
+          b.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        });
+      };
+
+      place();
+      window.addEventListener('resize', place);
+    })();
+
+    // ===== Sweep detection: flash blips when beam passes their angle =====
+    (function sweepDetect(){
+      const beam = document.getElementById('radarBeam');
+      const field = document.getElementById('blipField');
+      if(!beam || !field) return;
+
+      const blips = Array.from(field.querySelectorAll('.blip'));
+      const sweepPeriodMs = 8000; // must match CSS sweep 8s
+      const hitWindowDeg = 3.5;   // how close the beam must be to "hit"
+      const cooldownMs = 700;     // prevents double-trigger on same pass
+
+      const lastHit = new WeakMap();
+
+      // time-based angle is more reliable than reading computed transforms
+      const start = performance.now();
+
+      function tick(now){
+        const t = (now - start) % sweepPeriodMs;
+        const sweepAngle = (t / sweepPeriodMs) * 360; // 0..360
+
+        blips.forEach(b => {
+          const a = (parseFloat(b.dataset.angle || "0") % 360 + 360) % 360;
+
+          // shortest angular distance (wrap-around safe)
+          let d = Math.abs(sweepAngle - a);
+          if(d > 180) d = 360 - d;
+
+          if(d <= hitWindowDeg){
+            const last = lastHit.get(b) || 0;
+            if(now - last > cooldownMs){
+              lastHit.set(b, now);
+              b.classList.remove('ping'); // restart animation
+              // force reflow so animation restarts reliably
+              void b.offsetWidth;
+              b.classList.add('ping');
+            }
+          }
+        });
+
+        requestAnimationFrame(tick);
+      }
+
+      requestAnimationFrame(tick);
+    })();
+  </script>
 </body>
-
 </html>
