@@ -1,276 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <title>Lima Delta Aerial | Drone Services</title>
 
-<link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon.png" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet" />
 
 <style>
-
 :root{
---lime:#39ff14;
---black:#000;
---white:#fff;
+  --lime:#39ff14;
+  --black:#000;
+  --white:#fff;
 }
 
-*{box-sizing:border-box;}
+*{ box-sizing:border-box; }
 
 body{
-margin:0;
-height:100vh;
-background:#000;
-color:#fff;
-font-family:'Montserrat',sans-serif;
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-overflow:hidden;
+  margin:0;
+  min-height:100vh;
+  background:var(--black);
+  color:var(--white);
+  font-family:'Montserrat',sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  overflow:hidden;
 }
 
-/* soft green glow background */
-
+/* soft ambient glow */
 .bg{
-position:fixed;
-inset:0;
-pointer-events:none;
-background:
-radial-gradient(circle at center, rgba(57,255,20,.18), transparent 70%);
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 650px at 50% 40%, rgba(57,255,20,.14), transparent 62%),
+    radial-gradient(900px 650px at 50% 70%, rgba(57,255,20,.06), transparent 70%);
 }
 
-/* radar grid */
-
+/* subtle grid (real radar feel = present but not dominant) */
 .grid{
-position:fixed;
-inset:0;
-pointer-events:none;
-opacity:.18;
-
-background:
-repeating-linear-gradient(
-0deg,
-rgba(57,255,20,.18),
-rgba(57,255,20,.18) 1px,
-transparent 1px,
-transparent 48px
-),
-
-repeating-linear-gradient(
-90deg,
-rgba(57,255,20,.18),
-rgba(57,255,20,.18) 1px,
-transparent 1px,
-transparent 48px
-);
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.16;
+  mix-blend-mode:screen;
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(57,255,20,.18),
+      rgba(57,255,20,.18) 1px,
+      transparent 1px,
+      transparent 56px
+    ),
+    repeating-linear-gradient(90deg,
+      rgba(57,255,20,.18),
+      rgba(57,255,20,.18) 1px,
+      transparent 1px,
+      transparent 56px
+    );
 }
 
-/* radar rings */
-
+/* BIG range rings (bigger + brighter so you actually see them) */
 .rings{
-position:fixed;
-inset:0;
-display:flex;
-align-items:center;
-justify-content:center;
-pointer-events:none;
-opacity:.40;
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  opacity:.48;
+  mix-blend-mode:screen;
 }
 
 .rings::before{
-content:"";
-width:900px;
-height:900px;
-border-radius:50%;
+  content:"";
+  width:min(108vmin, 1180px);
+  height:min(108vmin, 1180px);
+  border-radius:50%;
+  background:
+    radial-gradient(circle at center,
+      transparent 0%,
+      transparent 18%,
+      rgba(57,255,20,.48) 18.2%,
+      transparent 18.6%,
 
-background:
+      transparent 36%,
+      rgba(57,255,20,.40) 36.2%,
+      transparent 36.6%,
 
-radial-gradient(circle at center,
-transparent 0%,
-transparent 25%,
-rgba(57,255,20,.45) 25.3%,
-transparent 25.6%,
+      transparent 54%,
+      rgba(57,255,20,.32) 54.2%,
+      transparent 54.6%,
 
-transparent 45%,
-rgba(57,255,20,.38) 45.3%,
-transparent 45.6%,
+      transparent 72%,
+      rgba(57,255,20,.26) 72.2%,
+      transparent 72.6%,
 
-transparent 65%,
-rgba(57,255,20,.32) 65.3%,
-transparent 65.6%,
-
-transparent 85%,
-rgba(57,255,20,.26) 85.3%,
-transparent 85.6%
-);
-
-filter:drop-shadow(0 0 18px rgba(57,255,20,.45));
+      transparent 90%,
+      rgba(57,255,20,.20) 90.2%,
+      transparent 90.6%
+    );
+  filter: drop-shadow(0 0 18px rgba(57,255,20,.28));
 }
 
-/* radar sweep */
+/* subtle center dot (helps radar realism without crosshair lines) */
+.centerDot{
+  position:fixed;
+  left:50%;
+  top:50%;
+  width:6px;
+  height:6px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:rgba(57,255,20,.55);
+  box-shadow:0 0 12px rgba(57,255,20,.35);
+  pointer-events:none;
+  opacity:.55;
+  mix-blend-mode:screen;
+}
 
+/* Darker blips (less bright, more “contact” subtlety) */
+.blips{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.12;           /* darker overall */
+  mix-blend-mode:screen;
+  filter: blur(.15px);
+  background:
+    radial-gradient(circle, rgba(57,255,20,.55) 0 1px, transparent 2px) 12% 26%/420px 420px,
+    radial-gradient(circle, rgba(57,255,20,.50) 0 1px, transparent 2px) 68% 34%/520px 520px,
+    radial-gradient(circle, rgba(57,255,20,.45) 0 1px, transparent 2px) 44% 78%/480px 480px,
+    radial-gradient(circle, rgba(57,255,20,.40) 0 1px, transparent 2px) 80% 70%/560px 560px;
+  animation: drift 22s linear infinite;
+}
+
+@keyframes drift{
+  from{ transform: translate3d(0,0,0); }
+  to{ transform: translate3d(90px,-70px,0); }
+}
+
+/* REAL radar sweep: thin bright edge + soft trail */
 .radar{
-position:fixed;
-inset:0;
-pointer-events:none;
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  mix-blend-mode:screen;
 }
 
 .radar::before{
-content:"";
-position:absolute;
-
-width:140vmax;
-height:140vmax;
-
-left:50%;
-top:50%;
-
-transform:translate(-50%,-50%);
-
-background:
-conic-gradient(
-from 0deg,
-transparent 0deg,
-rgba(57,255,20,.65) 16deg,
-transparent 32deg
-);
-
-opacity:.32;
-
-mix-blend-mode:screen;
-
-animation:sweep 7s linear infinite;
-
-filter:blur(1px);
+  content:"";
+  position:absolute;
+  width:150vmax;
+  height:150vmax;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  /* trail + leading edge */
+  background:conic-gradient(
+    from 0deg,
+    rgba(57,255,20,0.00) 0deg,
+    rgba(57,255,20,0.04) 12deg,
+    rgba(57,255,20,0.10) 18deg,
+    rgba(57,255,20,0.22) 22deg,
+    rgba(57,255,20,0.55) 24deg,  /* leading edge */
+    rgba(57,255,20,0.00) 26deg,
+    transparent 360deg
+  );
+  opacity:.55;
+  filter: blur(0.8px);
+  animation:sweep 6.8s linear infinite;
 }
 
 @keyframes sweep{
-from{transform:translate(-50%,-50%) rotate(0deg);}
-to{transform:translate(-50%,-50%) rotate(360deg);}
+  from{ transform:translate(-50%,-50%) rotate(0deg); }
+  to{ transform:translate(-50%,-50%) rotate(360deg); }
 }
 
-/* subtle screen texture */
-
+/* faint scanlines */
 .scanlines{
-position:fixed;
-inset:0;
-pointer-events:none;
-opacity:.08;
-
-background:repeating-linear-gradient(
-to bottom,
-rgba(255,255,255,.06),
-rgba(255,255,255,.06) 1px,
-transparent 1px,
-transparent 6px
-);
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.06;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,.05),
+    rgba(255,255,255,.05) 1px,
+    transparent 1px,
+    transparent 7px
+  );
+  mix-blend-mode:overlay;
 }
 
 /* center content */
-
 .wrapper{
-position:relative;
-z-index:2;
-padding:40px;
+  position:relative;
+  z-index:2;
+  padding:44px 18px;
+  width:min(920px, 92vw);
+  animation: fadeUp .9s ease-out both;
 }
 
-/* logo */
+@keyframes fadeUp{
+  from{ opacity:0; transform: translateY(14px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+.logo{
+  display:flex;
+  justify-content:center;
+}
 
 .logo img{
-width:420px;
-max-width:85%;
-
-filter:
-drop-shadow(0 0 12px rgba(57,255,20,.65))
-drop-shadow(0 0 40px rgba(57,255,20,.35));
-
-animation:glow 3s ease-in-out infinite;
+  width:min(520px, 86vw);
+  height:auto;
+  filter:
+    drop-shadow(0 0 12px rgba(57,255,20,.60))
+    drop-shadow(0 0 44px rgba(57,255,20,.30));
+  animation: glow 3s ease-in-out infinite;
 }
 
 @keyframes glow{
-0%,100%{
-filter:
-drop-shadow(0 0 10px rgba(57,255,20,.55))
-drop-shadow(0 0 36px rgba(57,255,20,.28));
+  0%,100%{
+    filter:
+      drop-shadow(0 0 10px rgba(57,255,20,.52))
+      drop-shadow(0 0 38px rgba(57,255,20,.26));
+  }
+  50%{
+    filter:
+      drop-shadow(0 0 16px rgba(57,255,20,.82))
+      drop-shadow(0 0 58px rgba(57,255,20,.36));
+  }
 }
-
-50%{
-filter:
-drop-shadow(0 0 16px rgba(57,255,20,.85))
-drop-shadow(0 0 52px rgba(57,255,20,.38));
-}
-}
-
-/* services */
 
 .services{
-margin-top:34px;
-font-weight:600;
-letter-spacing:2px;
-line-height:1.9;
-font-size:22px;
-text-transform:uppercase;
+  margin-top:34px;
+  font-weight:600;
+  letter-spacing:2px;
+  line-height:1.9;
+  font-size: clamp(18px, 2.2vw, 22px);
+  text-transform: uppercase;
 }
-
-/* divider */
 
 .divider{
-width:450px;
-max-width:80%;
-height:1px;
-margin:28px auto;
-
-background:linear-gradient(
-90deg,
-transparent,
-rgba(57,255,20,.9),
-transparent
-);
+  width:min(520px, 78vw);
+  height:1px;
+  margin:28px auto 20px;
+  background: linear-gradient(90deg, transparent, rgba(57,255,20,.85), transparent);
+  opacity:.95;
 }
-
-/* coming soon */
 
 .coming{
-font-weight:800;
-letter-spacing:6px;
-font-size:18px;
-color:#39ff14;
-text-shadow:0 0 12px rgba(57,255,20,.8);
+  font-weight:800;
+  letter-spacing:6px;
+  font-size: clamp(16px, 2vw, 18px);
+  color: var(--lime);
+  text-shadow: 0 0 12px rgba(57,255,20,.75);
+  text-transform: uppercase;
 }
 
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .wrapper, .logo img, .radar::before, .blips{ animation:none !important; }
+}
 </style>
 </head>
 
 <body>
+  <div class="bg"></div>
+  <div class="grid"></div>
+  <div class="rings"></div>
+  <div class="centerDot"></div>
+  <div class="blips"></div>
+  <div class="radar"></div>
+  <div class="scanlines"></div>
 
-<div class="bg"></div>
-<div class="grid"></div>
-<div class="rings"></div>
-<div class="radar"></div>
-<div class="scanlines"></div>
+  <main class="wrapper">
+    <div class="logo">
+      <img src="logo.png" alt="Lima Delta Aerial Logo" />
+    </div>
 
-<div class="wrapper">
+    <div class="services">
+      Drone Services<br />
+      Construction Documentation<br />
+      Drone Repair
+    </div>
 
-<div class="logo">
-<img src="logo.png" alt="Lima Delta Aerial">
-</div>
+    <div class="divider"></div>
 
-<div class="services">
-Drone Services<br>
-Construction Documentation<br>
-Drone Repair
-</div>
-
-<div class="divider"></div>
-
-<div class="coming">COMING SOON</div>
-
-</div>
-
+    <div class="coming">COMING SOON</div>
+  </main>
 </body>
 </html>
