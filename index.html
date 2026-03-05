@@ -275,12 +275,11 @@
     }
 
     /* ping anim handles the bright moment + returns to dim */
-    .blip.ping{
-      animation: blipPing .9s ease-out;
-    }
+.blip.ping{
+  animation: blipPing .9s ease-out;
+}
 
-   @keyframes blipPing{
-
+@keyframes blipPing{
   0%{
     opacity:1;
     background:rgba(57,255,20,.95);
@@ -304,17 +303,7 @@
       0 0 0 22px rgba(57,255,20,0),
       0 0 6px 0 rgba(57,255,20,0);
   }
-
 }
-      100%{
-        opacity:.25; /* back to baseline */
-        background:rgba(57,255,20,.25);
-        box-shadow:
-          0 0 0 22px rgba(57,255,20,0),
-          0 0 6px 0 rgba(57,255,20,0);
-      }
-    }
-
     /* page wrapper */
     .wrapper{
       max-width:900px;
