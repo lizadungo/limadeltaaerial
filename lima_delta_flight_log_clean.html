@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lima Delta Flight Log</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #050805;
+  --bg2: #081008;
+  --card: #0b110b;
+  --card2: #101810;
+  --card3: #142014;
+  --text: #f1f6f1;
+  --muted: #91a991;
+  --muted2: #5f775f;
+  --border: #1d321d;
+  --border2: #284428;
+  --accent: #39ff14;
+  --accent2: #1fc90a;
+  --accent-dark: #137a05;
+  --accent-glow: rgba(57,255,20,0.12);
+  --danger: #ff4d4d;
+  --warn: #ffb22e;
+  --blue: #8aa8ff;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --radius: 18px;
+  --radius-sm: 11px;
+  --shadow: 0 14px 40px rgba(0,0,0,.28);
+}
+
+body.light {
+  --bg: #eef3ee;
+  --bg2: #e3ebe3;
+  --card: #ffffff;
+  --card2: #f3f7f3;
+  --card3: #e7efe7;
+  --text: #0f180f;
+  --muted: #5b715b;
+  --muted2: #8da08d;
+  --border: #cddccc;
+  --border2: #b8ccb8;
+  --accent: #159000;
+  --accent2: #117600;
+  --accent-dark: #0d5d00;
+  --accent-glow: rgba(21,144,0,0.09);
+  --shadow: 0 12px 30px rgba(40,60,40,.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background:
+    radial-gradient(circle at top right, rgba(57,255,20,.07), transparent 32%),
+    linear-gradient(180deg, var(--bg2), var(--bg));
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 0 70px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 14px 16px 13px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(11,17,11,.92);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+body.light .header { background: rgba(255,255,255,.9); }
+
+.logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--border2);
+  box-shadow: inset 0 0 0 1px rgba(57,255,20,.05);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-placeholder {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.7px;
+  line-height: 1;
+  text-align: center;
+}
+
+.title { flex: 1; min-width: 0; }
+
+.title h1 {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  color: var(--text);
+  line-height: 1;
+}
+
+.title p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 5px;
+  font-family: var(--mono);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: var(--card2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .12s, background .12s, border-color .12s;
+  flex-shrink: 0;
+}
+
+.icon-btn:active { transform: scale(.97); background: var(--card3); border-color: var(--border2); }
+
+#mainScreen, #logsScreen, #detailScreen { padding: 12px 12px 0; }
+
+/* SECTION CARDS */
+.section-card {
+  background: linear-gradient(180deg, var(--card), rgba(11,17,11,.86));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,.02);
+}
+
+body.light .section-card { background: var(--card); }
+
+.section-toggle {
+  width: 100%;
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  padding: 15px 16px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.section-toggle:active { background: var(--card2); }
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: 1;
+  min-width: 0;
+}
+
+.section-icon {
+  font-size: 17px;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.section-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+  flex-shrink: 0;
+}
+
+.section-badge.required {
+  color: var(--accent2);
+  border-color: var(--accent-dark);
+  background: var(--accent-glow);
+}
+
+.chevron {
+  color: var(--muted2);
+  font-size: 13px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.chevron.open { transform: rotate(180deg); }
+
+.section-body {
+  padding: 4px 16px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.section-body.collapsed { display: none; }
+
+/* FORM */
+.field { margin-top: 12px; }
+
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="datetime-local"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px 13px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border2);
+  background: var(--card2);
+  color: var(--text);
+  font-size: 15px;
+  font-family: var(--sans);
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color .12s, background .12s, box-shadow .12s;
+}
+
+input[type="text"]:focus,
+input[type="datetime-local"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent-dark);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+input::placeholder,
+textarea::placeholder { color: var(--muted2); }
+
+textarea {
+  min-height: 78px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a917a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  padding-right: 36px;
+}
+
+/* CHECKBOXES */
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 13px;
+  margin-top: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color .12s, background .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.check-item:active { background: var(--card3); }
+
+.check-item.checked {
+  border-color: var(--accent-dark);
+  background: var(--accent-glow);
+}
+
+.check-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* BUTTONS */
+.actions-bar {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+  padding-bottom: 6px;
+}
+
+.btn-primary,
+.btn-secondary,
+.delete-btn {
+  border-radius: var(--radius);
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: transform .12s, opacity .12s, background .12s, border-color .12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #031003;
+  border: 0;
+}
+
+.btn-secondary {
+  background: rgba(11,17,11,.72);
+  color: var(--text);
+  border: 1px solid var(--border2);
+}
+
+body.light .btn-secondary { background: var(--card); }
+
+.btn-primary:active,
+.btn-secondary:active,
+.delete-btn:active {
+  transform: scale(.99);
+  opacity: .9;
+}
+
+.save-msg {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+.save-msg.success { color: var(--accent2); }
+
+/* LOGS */
+.logs-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 2px 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.logs-title h2 {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+
+.logs-title p {
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.log-count-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  background: rgba(11,17,11,.5);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.empty-state .empty-icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+  display: block;
+  opacity: .55;
+}
+
+/* LOG CARDS */
+.log-card {
+  background:
+    linear-gradient(180deg, rgba(57,255,20,.035), transparent 38%),
+    var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: transform .12s, border-color .12s, background .12s;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: var(--shadow);
+}
+
+body.light .log-card { background: var(--card); }
+
+.log-card:active {
+  transform: scale(.992);
+  border-color: var(--accent-dark);
+  background: var(--card2);
+}
+
+.log-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+
+.log-date {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.result-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 8px;
+  padding: 5px 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  flex-shrink: 0;
+}
+
+.result-badge.clean {
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid var(--accent-dark);
+}
+
+.result-badge.minor {
+  background: rgba(255,178,46,.12);
+  color: var(--warn);
+  border: 1px solid rgba(255,178,46,.28);
+}
+
+.result-badge.aborted {
+  background: rgba(255,77,77,.12);
+  color: var(--danger);
+  border: 1px solid rgba(255,77,77,.25);
+}
+
+.result-badge.followup {
+  background: rgba(138,168,255,.12);
+  color: var(--blue);
+  border: 1px solid rgba(138,168,255,.25);
+}
+
+.log-project {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.15;
+  letter-spacing: -0.25px;
+}
+
+.log-location {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 11px;
+}
+
+.log-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 8px;
+  color: var(--muted);
+}
+
+.risk-strip {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--warn);
+}
+
+/* DETAIL */
+.detail-hero {
+  padding: 4px 2px 13px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.detail-hero-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detail-project {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.13;
+  letter-spacing: -0.45px;
+}
+
+.detail-date {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--muted);
+  margin-top: 5px;
+}
+
+.detail-location-line {
+  margin-top: 9px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.detail-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,.02);
+}
+
+.detail-section-title {
+  padding: 11px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--card2);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.detail-row {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+
+.detail-row:nth-child(odd) { border-right: 1px solid var(--border); }
+.detail-row:nth-last-child(-n+2) { border-bottom: 0; }
+
+.detail-row.full {
+  grid-column: 1 / -1;
+  border-right: 0;
+}
+
+.detail-row.full:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+.detail-row.full:last-child { border-bottom: 0; }
+
+.detail-key {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+  margin-bottom: 4px;
+}
+
+.detail-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.detail-val.muted {
+  color: var(--muted2);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.checks-grid {
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.check-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.check-display.done {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.check-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted2);
+  flex-shrink: 0;
+}
+
+.check-dot.done {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.note-block {
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.delete-btn {
+  background: rgba(255,77,77,.08);
+  color: var(--danger);
+  border: 1px solid rgba(255,77,77,.25);
+}
+
+.hidden { display: none !important; }
+
+@media (max-width: 380px) {
+  .detail-grid,
+  .checks-grid { grid-template-columns: 1fr; }
+  .detail-row:nth-child(odd) { border-right: 0; }
+  .detail-row:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+  .detail-row:last-child { border-bottom: 0; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo">
+      <img src="logo.png" alt="LD" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="logo-placeholder" style="display:none">LD</div>
+    </div>
+    <div class="title">
+      <h1>Lima Delta</h1>
+      <p>Flight Log</p>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="showLogs()" title="View logs">📋</button>
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">☀️</button>
+    </div>
+  </div>
+
+  <div id="mainScreen">
+
+    <section class="section-card" style="margin-top:12px">
+      <button class="section-toggle" onclick="toggleSection('sFlightInfo', this)">
+        <span class="section-label">
+          <span class="section-icon">✈️</span>
+          <span class="section-title">Flight Info</span>
+        </span>
+        <span class="section-badge required">Required</span>
+        <span class="chevron open">▾</span>
+      </button>
+      <div class="section-body" id="sFlightInfo">
+        <div class="field">
+          <label>Date / Time</label>
+          <input type="datetime-local" id="dateTime">
+        </div>
+        <div class="field">
+          <label>Project / Site</label>
+          <input type="text" id="project" placeholder="South Beach / SBPC / Repair test">
+        </div>
+        <div class="field">
+          <label>Location</label>
+          <input type="text" id="location" placeholder="Parking lot, shoreline, jobsite…">
+        </div>
+        <div class="field">
+          <label>Drone</label>
+          <select id="drone">
+            <option>DJI Mini 2</option>
+            <option>DJI Air 2S</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Purpose</label>
+          <select id="purpose">
+            <option>Practice flight</option>
+            <option>Test flight</option>
+            <option>Repair verification</option>
+            <option>Construction documentation</option>
+            <option>Portfolio footage</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <button class="section-toggle" onclick="toggleSection('sWeather', this)">
+        <span class="section-label">
+          <span class="section-icon">🌤</span>
+          <span class="section-title">Weather</span>
+        </span>
+        <span class="section-badge">Manual</span>
+        <span class="chevron">▾</span>
+      </button>
+      <div class="section-body collapsed" id="sWeather">
+        <div class="field">
+          <label>Wind</label>
+          <select id="wind">
+            <option>0–5 mph</option>
+            <option>5–10 mph</option>
+            <option>10–15 mph</option>
+            <option>15+ mph</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Gusts</label>
+          <select id="gusts">
+            <option>None</option>
+            <option>Light</option>
+            <option>Moderate</option>
+            <option>Strong</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Conditions</label>
+          <select id="conditions">
+            <option>Clear</option>
+            <option>Partly cloudy</option>
+            <option>Overcast</option>
+            <option>Drizzle</option>
+            <option>Rain nearby</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Weather Notes</label>
+          <textarea id="weatherNotes" placeholder="e.g. feels gusty near buildings"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <button class="section-toggle" onclick="toggleSection('sAirspace', this)">
+        <span class="section-label">
+          <span class="section-icon">🗺</span>
+          <span class="section-title">Airspace</span>
+        </span>
+        <span class="section-badge">Pre-flight</span>
+        <span class="chevron">▾</span>
+      </button>
+      <div class="section-body collapsed" id="sAirspace">
+        <div class="field">
+          <label>Airspace Class</label>
+          <select id="airspaceClass">
+            <option>Class G</option>
+            <option>Class B</option>
+            <option>Class C</option>
+            <option>Class D</option>
+            <option>Class E Surface</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>LAANC Status</label>
+          <select id="laanc">
+            <option>Not needed</option>
+            <option>Approved</option>
+            <option>Needed – not requested</option>
+            <option>N/A</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Checks</label>
+          <div class="check-item" onclick="toggleCheck('aloftChecked', this)">
+            <input type="checkbox" id="aloftChecked"> Aloft / B4UFLY checked
+          </div>
+          <div class="check-item" onclick="toggleCheck('localAware', this)">
+            <input type="checkbox" id="localAware"> Local launch/landing rules considered
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <button class="section-toggle" onclick="toggleSection('sSite', this)">
+        <span class="section-label">
+          <span class="section-icon">📍</span>
+          <span class="section-title">Site Conditions</span>
+        </span>
+        <span class="section-badge">People / LZ</span>
+        <span class="chevron">▾</span>
+      </button>
+      <div class="section-body collapsed" id="sSite">
+        <div class="field">
+          <label>People Present</label>
+          <select id="people">
+            <option>None</option>
+            <option>1–2 nearby</option>
+            <option>Light foot traffic</option>
+            <option>Moderate foot traffic</option>
+            <option>Heavy / do not fly</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Obstacles</label>
+          <select id="obstacles">
+            <option>None</option>
+            <option>Trees</option>
+            <option>Wires</option>
+            <option>Buildings</option>
+            <option>Mixed</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Launch / Landing Zone</label>
+          <select id="lz">
+            <option>Clear</option>
+            <option>Tight but usable</option>
+            <option>Obstructed</option>
+            <option>Not acceptable</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <button class="section-toggle" onclick="toggleSection('sPreflight', this)">
+        <span class="section-label">
+          <span class="section-icon">✅</span>
+          <span class="section-title">Preflight Checklist</span>
+        </span>
+        <span class="section-badge">Tap through</span>
+        <span class="chevron">▾</span>
+      </button>
+      <div class="section-body collapsed" id="sPreflight">
+        <div class="check-item" onclick="toggleCheck('props', this)">
+          <input type="checkbox" id="props"> Props checked
+        </div>
+        <div class="check-item" onclick="toggleCheck('battery', this)">
+          <input type="checkbox" id="battery"> Battery secure / sufficient
+        </div>
+        <div class="check-item" onclick="toggleCheck('gimbal', this)">
+          <input type="checkbox" id="gimbal"> Gimbal / camera clear
+        </div>
+        <div class="check-item" onclick="toggleCheck('gps', this)">
+          <input type="checkbox" id="gps"> GPS / compass normal
+        </div>
+        <div class="check-item" onclick="toggleCheck('rth', this)">
+          <input type="checkbox" id="rth"> RTH altitude set
+        </div>
+        <div class="check-item" onclick="toggleCheck('controller', this)">
+          <input type="checkbox" id="controller"> Controller / phone battery OK
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <button class="section-toggle" onclick="toggleSection('sRisk', this)">
+        <span class="section-label">
+          <span class="section-icon">⚠️</span>
+          <span class="section-title">Risk Flags</span>
+        </span>
+        <span class="section-badge">Optional</span>
+        <span class="chevron">▾</span>
+      </button>
+      <div class="section-body collapsed" id="sRisk">
+        <div class="check-item" onclick="toggleCheck('riskWind', this)">
+          <input type="checkbox" id="riskWind"> Wind
+        </div>
+        <div class="check-item" onclick="toggleCheck('riskPeople', this)">
+          <input type="checkbox" id="riskPeople"> People movement
+        </div>
+        <div class="check-item" onclick="toggleCheck('riskSignal', this)">
+          <input type="checkbox" id="riskSignal"> Signal interference
+        </div>
+        <div class="check-item" onclick="toggleCheck('riskObstacles', this)">
+          <input type="checkbox" id="riskObstacles"> Obstacles
+        </div>
+        <div class="check-item" onclick="toggleCheck('riskBirds', this)">
+          <input type="checkbox" id="riskBirds"> Birds / wildlife
+        </div>
+        <div class="field">
+          <label>Other Risk Notes</label>
+          <textarea id="riskNotes" placeholder="e.g. birds near shoreline, gusts around structure"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <button class="section-toggle" onclick="toggleSection('sPost', this)">
+        <span class="section-label">
+          <span class="section-icon">🏁</span>
+          <span class="section-title">Post Flight</span>
+        </span>
+        <span class="section-badge">Close out</span>
+        <span class="chevron">▾</span>
+      </button>
+      <div class="section-body collapsed" id="sPost">
+        <div class="field">
+          <label>Result</label>
+          <select id="result">
+            <option>Clean flight</option>
+            <option>Minor issue</option>
+            <option>Aborted</option>
+            <option>Needs follow-up</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Post Flight Notes</label>
+          <textarea id="postNotes" placeholder="e.g. slight drift in gusts, footage usable"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions-bar">
+      <button class="btn-primary" onclick="saveLog()">Save Flight Log</button>
+      <button class="btn-secondary" onclick="showLogs()">View Saved Logs</button>
+    </div>
+    <p class="save-msg" id="saveMsg">Logs save locally on this device.</p>
+  </div>
+
+  <div id="logsScreen" class="hidden">
+    <div class="logs-top">
+      <div class="logs-title">
+        <h2>Saved Logs</h2>
+        <p>Local flight history</p>
+      </div>
+      <span class="log-count-pill" id="logCountPill">0 saved</span>
+    </div>
+    <div id="logsList"></div>
+    <div class="actions-bar">
+      <button class="btn-secondary" onclick="showMain()">← New Log</button>
+    </div>
+  </div>
+
+  <div id="detailScreen" class="hidden">
+    <div id="detailContent"></div>
+    <div class="actions-bar">
+      <button class="btn-secondary" onclick="showLogs()">← Back to Logs</button>
+      <button class="delete-btn" id="deleteBtn">Delete This Log</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+  document.getElementById("themeBtn").textContent = isLight ? "🌙" : "☀️";
+}
+
+function loadTheme() {
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light");
+    document.getElementById("themeBtn").textContent = "🌙";
+  }
+}
+
+function setDateTimeNow() {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById("dateTime").value = now.toISOString().slice(0, 16);
+}
+
+function toggleSection(id, btn) {
+  const body = document.getElementById(id);
+  const chevron = btn.querySelector(".chevron");
+  const willOpen = body.classList.contains("collapsed");
+  body.classList.toggle("collapsed", !willOpen);
+  chevron.classList.toggle("open", willOpen);
+}
+
+function toggleCheck(id, row) {
+  const cb = document.getElementById(id);
+  cb.checked = !cb.checked;
+  row.classList.toggle("checked", cb.checked);
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  if (!el) return "";
+  if (el.type === "checkbox") return el.checked;
+  return el.value.trim();
+}
+
+function getLogs() {
+  try { return JSON.parse(localStorage.getItem("flightLogs") || "[]"); }
+  catch { return []; }
+}
+
+function saveLogs(logs) {
+  localStorage.setItem("flightLogs", JSON.stringify(logs));
+}
+
+function saveLog() {
+  const log = {
+    id: Date.now(),
+    created: new Date().toISOString(),
+    dateTime: val("dateTime"),
+    project: val("project") || "Untitled",
+    location: val("location"),
+    drone: val("drone"),
+    purpose: val("purpose"),
+    wind: val("wind"),
+    gusts: val("gusts"),
+    conditions: val("conditions"),
+    weatherNotes: val("weatherNotes"),
+    airspaceClass: val("airspaceClass"),
+    laanc: val("laanc"),
+    aloftChecked: val("aloftChecked"),
+    localAware: val("localAware"),
+    people: val("people"),
+    obstacles: val("obstacles"),
+    lz: val("lz"),
+    props: val("props"),
+    battery: val("battery"),
+    gimbal: val("gimbal"),
+    gps: val("gps"),
+    rth: val("rth"),
+    controller: val("controller"),
+    riskWind: val("riskWind"),
+    riskPeople: val("riskPeople"),
+    riskSignal: val("riskSignal"),
+    riskObstacles: val("riskObstacles"),
+    riskBirds: val("riskBirds"),
+    riskNotes: val("riskNotes"),
+    result: val("result"),
+    postNotes: val("postNotes")
+  };
+
+  const logs = getLogs();
+  logs.unshift(log);
+  saveLogs(logs);
+
+  const msg = document.getElementById("saveMsg");
+  msg.textContent = "✔ Flight log saved";
+  msg.classList.add("success");
+
+  setTimeout(() => {
+    msg.textContent = "Logs save locally on this device.";
+    msg.classList.remove("success");
+  }, 2400);
+}
+
+function showMain() {
+  document.getElementById("mainScreen").classList.remove("hidden");
+  document.getElementById("logsScreen").classList.add("hidden");
+  document.getElementById("detailScreen").classList.add("hidden");
+  window.scrollTo(0, 0);
+}
+
+function showLogs() {
+  const logs = getLogs();
+  const list = document.getElementById("logsList");
+  document.getElementById("logCountPill").textContent = `${logs.length} saved`;
+
+  if (logs.length === 0) {
+    list.innerHTML = `<div class="empty-state"><span class="empty-icon">📋</span>No logs saved yet.<br>Complete a flight and tap Save.</div>`;
+  } else {
+    list.innerHTML = logs.map((log, i) => buildLogCard(log, i)).join("");
+  }
+
+  document.getElementById("mainScreen").classList.add("hidden");
+  document.getElementById("logsScreen").classList.remove("hidden");
+  document.getElementById("detailScreen").classList.add("hidden");
+  window.scrollTo(0, 0);
+}
+
+function showDetail(index) {
+  const logs = getLogs();
+  const log = logs[index];
+  if (!log) return;
+
+  document.getElementById("detailContent").innerHTML = buildDetailView(log);
+  document.getElementById("deleteBtn").onclick = () => deleteLog(index);
+
+  document.getElementById("mainScreen").classList.add("hidden");
+  document.getElementById("logsScreen").classList.add("hidden");
+  document.getElementById("detailScreen").classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+
+function formatDate(dateValue, longForm = false) {
+  if (!dateValue) return "—";
+  const d = new Date(dateValue);
+  if (isNaN(d)) return "—";
+
+  const opts = longForm
+    ? { weekday:"short", month:"long", day:"numeric", year:"numeric", hour:"numeric", minute:"2-digit" }
+    : { month:"short", day:"numeric", year:"numeric", hour:"numeric", minute:"2-digit" };
+
+  return d.toLocaleString("en-US", opts);
+}
+
+function badgeClass(result) {
+  return {
+    "Clean flight": "clean",
+    "Minor issue": "minor",
+    "Aborted": "aborted",
+    "Needs follow-up": "followup"
+  }[result] || "clean";
+}
+
+function activeRisks(log) {
+  const risks = [
+    ["riskWind", "Wind"],
+    ["riskPeople", "People"],
+    ["riskSignal", "Signal"],
+    ["riskObstacles", "Obstacles"],
+    ["riskBirds", "Birds"]
+  ];
+
+  return risks.filter(([key]) => log[key]).map(([, label]) => label);
+}
+
+function buildLogCard(log, index) {
+  const dateText = formatDate(log.dateTime);
+  const result = log.result || "Clean flight";
+  const chips = [log.drone, log.airspaceClass, log.wind]
+    .filter(Boolean)
+    .map(t => `<span class="meta-chip">${escapeHTML(t)}</span>`)
+    .join("");
+
+  const risks = activeRisks(log);
+  const riskHTML = risks.length
+    ? `<div class="risk-strip">⚠ Risk flags: ${escapeHTML(risks.join(", "))}</div>`
+    : "";
+
+  return `
+    <div class="log-card" onclick="showDetail(${index})">
+      <div class="log-card-top">
+        <div class="log-date">${escapeHTML(dateText)}</div>
+        <span class="result-badge ${badgeClass(result)}">${escapeHTML(result)}</span>
+      </div>
+      <div class="log-project">${escapeHTML(log.project || "Untitled")}</div>
+      ${log.location ? `<div class="log-location">📍 ${escapeHTML(log.location)}</div>` : ""}
+      <div class="log-meta">${chips}</div>
+      ${riskHTML}
+    </div>`;
+}
+
+function buildDetailView(log) {
+  const dateText = formatDate(log.dateTime, true);
+  const result = log.result || "Clean flight";
+
+  const preflightItems = [
+    ["props","Props checked"],
+    ["battery","Battery secure"],
+    ["gimbal","Gimbal / camera"],
+    ["gps","GPS / compass"],
+    ["rth","RTH altitude"],
+    ["controller","Controller / phone"]
+  ];
+
+  const riskItems = [
+    ["riskWind","Wind"],
+    ["riskPeople","People"],
+    ["riskSignal","Signal"],
+    ["riskObstacles","Obstacles"],
+    ["riskBirds","Birds / wildlife"]
+  ];
+
+  const preflightHTML = preflightItems.map(([key, label]) => checkDisplay(log[key], label)).join("");
+  const riskHTML = riskItems.map(([key, label]) => checkDisplay(log[key], label)).join("");
+
+  function row(label, value) {
+    const v = value === true ? "Yes" : value === false ? "No" : (value || "");
+    return `<div class="detail-row">
+      <div class="detail-key">${escapeHTML(label)}</div>
+      <div class="detail-val ${v ? "" : "muted"}">${v ? escapeHTML(v) : "—"}</div>
+    </div>`;
+  }
+
+  function fullRow(label, value) {
+    const v = value === true ? "Yes" : value === false ? "No" : (value || "");
+    return `<div class="detail-row full">
+      <div class="detail-key">${escapeHTML(label)}</div>
+      <div class="detail-val ${v ? "" : "muted"}">${v ? escapeHTML(v) : "—"}</div>
+    </div>`;
+  }
+
+  return `
+    <div class="detail-hero">
+      <div class="detail-hero-row">
+        <div>
+          <div class="detail-project">${escapeHTML(log.project || "Untitled")}</div>
+          <div class="detail-date">${escapeHTML(dateText)}</div>
+        </div>
+        <span class="result-badge ${badgeClass(result)}">${escapeHTML(result)}</span>
+      </div>
+      ${log.location ? `<div class="detail-location-line">📍 ${escapeHTML(log.location)}</div>` : ""}
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">✈️ Flight Info</div>
+      <div class="detail-grid">
+        ${row("Drone", log.drone)}
+        ${row("Purpose", log.purpose)}
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">🌤 Weather</div>
+      <div class="detail-grid">
+        ${row("Wind", log.wind)}
+        ${row("Gusts", log.gusts)}
+        ${row("Conditions", log.conditions)}
+        ${fullRow("Weather Notes", log.weatherNotes)}
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">🗺 Airspace</div>
+      <div class="detail-grid">
+        ${row("Class", log.airspaceClass)}
+        ${row("LAANC", log.laanc)}
+        ${row("Aloft / B4UFLY", log.aloftChecked ? "Yes" : "No")}
+        ${row("Local Rules", log.localAware ? "Yes" : "No")}
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">📍 Site Conditions</div>
+      <div class="detail-grid">
+        ${row("People", log.people)}
+        ${row("Obstacles", log.obstacles)}
+        ${row("LZ", log.lz)}
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">✅ Preflight</div>
+      <div class="checks-grid">${preflightHTML}</div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">⚠️ Risk Flags</div>
+      <div class="checks-grid">${riskHTML}</div>
+      ${log.riskNotes ? `<div class="note-block">${escapeHTML(log.riskNotes)}</div>` : ""}
+    </div>
+
+    ${log.postNotes ? `
+    <div class="detail-section">
+      <div class="detail-section-title">🏁 Post Flight Notes</div>
+      <div class="note-block">${escapeHTML(log.postNotes)}</div>
+    </div>` : ""}
+  `;
+}
+
+function checkDisplay(done, label) {
+  return `
+    <div class="check-display ${done ? "done" : ""}">
+      <div class="check-dot ${done ? "done" : ""}"></div>
+      ${escapeHTML(label)}
+    </div>`;
+}
+
+function deleteLog(index) {
+  if (!confirm("Delete this flight log?")) return;
+  const logs = getLogs();
+  logs.splice(index, 1);
+  saveLogs(logs);
+  showLogs();
+}
+
+loadTheme();
+setDateTimeNow();
+</script>
+</body>
+</html>
