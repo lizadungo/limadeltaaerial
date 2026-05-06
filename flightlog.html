@@ -965,10 +965,7 @@ body.light .log-card { background: var(--card); }
           <label>Operational Flags</label>
           <div class="check-item" onclick="toggleCheck('opFaaCompliant', this)">
             <input type="checkbox" id="opFaaCompliant"> FAA compliant
-          </div>
-          <div class="check-item" onclick="toggleCheck('opLaancAuthorized', this)">
-            <input type="checkbox" id="opLaancAuthorized"> LAANC authorized
-          </div>
+          </div>          
           <div class="check-item" onclick="toggleCheck('opLocalRestriction', this)">
             <input type="checkbox" id="opLocalRestriction"> Local restriction present
           </div>
@@ -1250,8 +1247,7 @@ function saveLog() {
 
     airspaceClass: val("airspaceClass"),
     laanc: val("laanc"),
-    opFaaCompliant: val("opFaaCompliant"),
-    opLaancAuthorized: val("opLaancAuthorized"),
+    opFaaCompliant: val("opFaaCompliant"),    
     opLocalRestriction: val("opLocalRestriction"),
     opPrivateProperty: val("opPrivateProperty"),
     opTestHover: val("opTestHover"),
@@ -1341,7 +1337,6 @@ function resetFormForNextLog() {
     "aloftChecked",
     "localAware",
     "opFaaCompliant",
-    "opLaancAuthorized",
     "opLocalRestriction",
     "opPrivateProperty",
     "opTestHover",
@@ -1495,8 +1490,7 @@ function buildDetailView(log) {
   const riskHTML = riskItems.map(([key, label]) => checkDisplay(log[key], label)).join("");
 
   const operationalItems = [
-    ["opFaaCompliant","FAA compliant"],
-    ["opLaancAuthorized","LAANC authorized"],
+    ["opFaaCompliant","FAA compliant"],    
     ["opLocalRestriction","Local restriction present"],
     ["opPrivateProperty","Private property operation"],
     ["opTestHover","Test hover only"],
