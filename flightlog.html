@@ -963,22 +963,22 @@ body.light .log-card { background: var(--card); }
         </div>
         <div class="field">
           <label>Operational Flags</label>
-          <div class="check-item" onclick="toggleCheck('opFaaCompliant', this)">
+          <div class="check-item" onclick="toggleCheck('opFaaCompliant', this, event)">
             <input type="checkbox" id="opFaaCompliant"> FAA compliant
           </div>          
-          <div class="check-item" onclick="toggleCheck('opLocalRestriction', this)">
+          <div class="check-item" onclick="toggleCheck('opLocalRestriction', this, event)">
             <input type="checkbox" id="opLocalRestriction"> Local restriction present
           </div>
-          <div class="check-item" onclick="toggleCheck('opPrivateProperty', this)">
+          <div class="check-item" onclick="toggleCheck('opPrivateProperty', this, event)">
             <input type="checkbox" id="opPrivateProperty"> Private property operation
           </div>
-          <div class="check-item" onclick="toggleCheck('opTestHover', this)">
+          <div class="check-item" onclick="toggleCheck('opTestHover', this, event)">
             <input type="checkbox" id="opTestHover"> Test hover only
           </div>
-          <div class="check-item" onclick="toggleCheck('opObservationOnly', this)">
+          <div class="check-item" onclick="toggleCheck('opObservationOnly', this, event)">
             <input type="checkbox" id="opObservationOnly"> Observation only / no launch
           </div>
-          <div class="check-item" onclick="toggleCheck('opManualReview', this)">
+          <div class="check-item" onclick="toggleCheck('opManualReview', this, event)">
             <input type="checkbox" id="opManualReview"> Manual review needed
           </div>
         </div>
@@ -990,10 +990,10 @@ body.light .log-card { background: var(--card); }
 
         <div class="field">
           <label>Checks</label>
-          <div class="check-item" onclick="toggleCheck('aloftChecked', this)">
+          <div class="check-item" onclick="toggleCheck('aloftChecked', this, event)">
             <input type="checkbox" id="aloftChecked"> Aloft / B4UFLY checked
           </div>
-          <div class="check-item" onclick="toggleCheck('localAware', this)">
+          <div class="check-item" onclick="toggleCheck('localAware', this, event)">
             <input type="checkbox" id="localAware"> Local launch/landing rules considered
           </div>
         </div>
@@ -1043,7 +1043,7 @@ body.light .log-card { background: var(--card); }
     </section>
 
     <section class="section-card">
-      <button class="section-toggle" onclick="toggleSection('sPreflight', this)">
+      <button class="section-toggle" onclick="toggleSection('sPreflight', this, event)">
         <span class="section-label">
           <span class="section-icon">✅</span>
           <span class="section-title">Preflight Checklist</span>
@@ -1052,22 +1052,22 @@ body.light .log-card { background: var(--card); }
         <span class="chevron">▾</span>
       </button>
       <div class="section-body collapsed" id="sPreflight">
-        <div class="check-item" onclick="toggleCheck('props', this)">
+        <div class="check-item" onclick="toggleCheck('props', this, event)">
           <input type="checkbox" id="props"> Props checked
         </div>
-        <div class="check-item" onclick="toggleCheck('battery', this)">
+        <div class="check-item" onclick="toggleCheck('battery', this, event)">
           <input type="checkbox" id="battery"> Battery secure / sufficient
         </div>
-        <div class="check-item" onclick="toggleCheck('gimbal', this)">
+        <div class="check-item" onclick="toggleCheck('gimbal', this, event)">
           <input type="checkbox" id="gimbal"> Gimbal / camera clear
         </div>
-        <div class="check-item" onclick="toggleCheck('gps', this)">
+        <div class="check-item" onclick="toggleCheck('gps', this, event)">
           <input type="checkbox" id="gps"> GPS / compass normal
         </div>
-        <div class="check-item" onclick="toggleCheck('rth', this)">
+        <div class="check-item" onclick="toggleCheck('rth', this, event)">
           <input type="checkbox" id="rth"> RTH altitude set
         </div>
-        <div class="check-item" onclick="toggleCheck('controller', this)">
+        <div class="check-item" onclick="toggleCheck('controller', this, event)">
           <input type="checkbox" id="controller"> Controller / phone battery OK
         </div>
       </div>
@@ -1083,19 +1083,19 @@ body.light .log-card { background: var(--card); }
         <span class="chevron">▾</span>
       </button>
       <div class="section-body collapsed" id="sRisk">
-        <div class="check-item" onclick="toggleCheck('riskWind', this)">
+        <div class="check-item" onclick="toggleCheck('riskWind', this, event)">
           <input type="checkbox" id="riskWind"> Wind
         </div>
-        <div class="check-item" onclick="toggleCheck('riskPeople', this)">
+        <div class="check-item" onclick="toggleCheck('riskPeople', this, event)">
           <input type="checkbox" id="riskPeople"> People movement
         </div>
-        <div class="check-item" onclick="toggleCheck('riskSignal', this)">
+        <div class="check-item" onclick="toggleCheck('riskSignal', this, event)">
           <input type="checkbox" id="riskSignal"> Signal interference
         </div>
-        <div class="check-item" onclick="toggleCheck('riskObstacles', this)">
+        <div class="check-item" onclick="toggleCheck('riskObstacles', this, event)">
           <input type="checkbox" id="riskObstacles"> Obstacles
         </div>
-        <div class="check-item" onclick="toggleCheck('riskBirds', this)">
+        <div class="check-item" onclick="toggleCheck('riskBirds', this, event)">
           <input type="checkbox" id="riskBirds"> Birds / wildlife
         </div>
         <div class="field">
@@ -1201,9 +1201,13 @@ function toggleSection(id, btn) {
   chevron.classList.toggle("open", willOpen);
 }
 
-function toggleCheck(id, row) {
+function toggleCheck(id, row, event) {
+  if (event.target.tagName !== "INPUT") {
+    const cb = document.getElementById(id);
+    cb.checked = !cb.checked;
+  }
+
   const cb = document.getElementById(id);
-  cb.checked = !cb.checked;
   row.classList.toggle("checked", cb.checked);
 }
 
