@@ -775,6 +775,58 @@ body.light .log-card { background: var(--card); }
       </div>
     </section>
 
+
+    <section class="section-card">
+      <button class="section-toggle" onclick="toggleSection('sBattery', this)">
+        <span class="section-label">
+          <span class="section-icon">🔋</span>
+          <span class="section-title">Battery</span>
+        </span>
+        <span class="section-badge">Equipment</span>
+        <span class="chevron">▾</span>
+      </button>
+
+      <div class="section-body collapsed" id="sBattery">
+        <div class="field">
+          <label>Battery ID</label>
+          <select id="batteryId">
+            <option>Battery #1</option>
+            <option>Battery #2</option>
+            <option>Battery #3</option>
+            <option>Battery #4</option>
+            <option>Battery #5</option>
+            <option>Battery #6</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Start %</label>
+          <input type="text" id="batteryStart" placeholder="100%">
+        </div>
+
+        <div class="field">
+          <label>End %</label>
+          <input type="text" id="batteryEnd" placeholder="18%">
+        </div>
+
+        <div class="field">
+          <label>Battery Status</label>
+          <select id="batteryStatus">
+            <option>Normal</option>
+            <option>Warm after flight</option>
+            <option>Fast drain noticed</option>
+            <option>Voltage warning</option>
+            <option>Needs monitoring</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Battery Notes</label>
+          <textarea id="batteryNotes" placeholder="e.g. drained quickly in wind, warm after charging"></textarea>
+        </div>
+      </div>
+    </section>
+
     <section class="section-card">
       <button class="section-toggle" onclick="toggleSection('sWeather', this)">
         <span class="section-label">
@@ -1206,7 +1258,7 @@ function activeRisks(log) {
 function buildLogCard(log, index) {
   const dateText = formatDate(log.dateTime);
   const result = log.result || "Clean flight";
-  const chips = [log.drone, log.airspaceClass, log.wind]
+  const chips = [log.drone, log.batteryId, log.airspaceClass, log.wind]
     .filter(Boolean)
     .map(t => `<span class="meta-chip">${escapeHTML(t)}</span>`)
     .join("");
@@ -1286,6 +1338,18 @@ function buildDetailView(log) {
       <div class="detail-grid">
         ${row("Drone", log.drone)}
         ${row("Purpose", log.purpose)}
+      </div>
+    </div>
+
+
+    <div class="detail-section">
+      <div class="detail-section-title">🔋 Battery</div>
+      <div class="detail-grid">
+        ${row("Battery", log.batteryId)}
+        ${row("Status", log.batteryStatus)}
+        ${row("Start %", log.batteryStart)}
+        ${row("End %", log.batteryEnd)}
+        ${fullRow("Battery Notes", log.batteryNotes)}
       </div>
     </div>
 
