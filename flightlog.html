@@ -118,10 +118,10 @@ body.light .header { background: rgba(255,255,255,.9); }
 .title { flex: 1; min-width: 0; }
 
 .title h1 {
-  font-family: var(--sans);
-  font-size: 17px;
+  font-family: var(--mono);
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.7px;
   color: var(--text);
   line-height: 1;
 }
@@ -777,7 +777,7 @@ body.light .log-card { background: var(--card); }
 
   <div class="header">
     <div class="logo">
-      <img src="flightlog-icon.png" alt="LD" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img src="logo.png" alt="LD" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="logo-placeholder" style="display:none">LD</div>
     </div>
     <div class="title">
@@ -961,6 +961,36 @@ body.light .log-card { background: var(--card); }
             <option>N/A</option>
           </select>
         </div>
+        <div class="field">
+          <label>Operational Flags</label>
+          <div class="check-item" onclick="toggleCheck('opFaaCompliant', this)">
+            <input type="checkbox" id="opFaaCompliant"> FAA compliant
+          </div>
+          <div class="check-item" onclick="toggleCheck('opLaancAuthorized', this)">
+            <input type="checkbox" id="opLaancAuthorized"> LAANC authorized
+          </div>
+          <div class="check-item" onclick="toggleCheck('opLocalRestriction', this)">
+            <input type="checkbox" id="opLocalRestriction"> Local restriction present
+          </div>
+          <div class="check-item" onclick="toggleCheck('opPrivateProperty', this)">
+            <input type="checkbox" id="opPrivateProperty"> Private property operation
+          </div>
+          <div class="check-item" onclick="toggleCheck('opTestHover', this)">
+            <input type="checkbox" id="opTestHover"> Test hover only
+          </div>
+          <div class="check-item" onclick="toggleCheck('opObservationOnly', this)">
+            <input type="checkbox" id="opObservationOnly"> Observation only / no launch
+          </div>
+          <div class="check-item" onclick="toggleCheck('opManualReview', this)">
+            <input type="checkbox" id="opManualReview"> Manual review needed
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Operational Notes</label>
+          <textarea id="operationalNotes" placeholder="e.g. NYC local restriction present; low-risk shoreline hover only"></textarea>
+        </div>
+
         <div class="field">
           <label>Checks</label>
           <div class="check-item" onclick="toggleCheck('aloftChecked', this)">
@@ -1220,6 +1250,14 @@ function saveLog() {
 
     airspaceClass: val("airspaceClass"),
     laanc: val("laanc"),
+    opFaaCompliant: val("opFaaCompliant"),
+    opLaancAuthorized: val("opLaancAuthorized"),
+    opLocalRestriction: val("opLocalRestriction"),
+    opPrivateProperty: val("opPrivateProperty"),
+    opTestHover: val("opTestHover"),
+    opObservationOnly: val("opObservationOnly"),
+    opManualReview: val("opManualReview"),
+    operationalNotes: val("operationalNotes"),
     aloftChecked: val("aloftChecked"),
     localAware: val("localAware"),
 
@@ -1268,6 +1306,7 @@ function resetFormForNextLog() {
     "batteryEnd",
     "batteryNotes",
     "weatherNotes",
+    "operationalNotes",
     "riskNotes",
     "postNotes"
   ];
@@ -1301,6 +1340,13 @@ function resetFormForNextLog() {
   const checkboxIds = [
     "aloftChecked",
     "localAware",
+    "opFaaCompliant",
+    "opLaancAuthorized",
+    "opLocalRestriction",
+    "opPrivateProperty",
+    "opTestHover",
+    "opObservationOnly",
+    "opManualReview",
     "props",
     "battery",
     "gimbal",
@@ -1448,6 +1494,22 @@ function buildDetailView(log) {
   const preflightHTML = preflightItems.map(([key, label]) => checkDisplay(log[key], label)).join("");
   const riskHTML = riskItems.map(([key, label]) => checkDisplay(log[key], label)).join("");
 
+  const operationalItems = [
+    ["opFaaCompliant","FAA compliant"],
+    ["opLaancAuthorized","LAANC authorized"],
+    ["opLocalRestriction","Local restriction present"],
+    ["opPrivateProperty","Private property operation"],
+    ["opTestHover","Test hover only"],
+    ["opObservationOnly","Observation only / no launch"],
+    ["opManualReview","Manual review needed"]
+  ];
+
+  const activeOperational = operationalItems
+    .filter(([key]) => log[key])
+    .map(([, label]) => label);
+
+  const operationalText = activeOperational.length ? activeOperational.join(", ") : "";
+
   function row(label, value) {
     const v = value === true ? "Yes" : value === false ? "No" : (value || "");
     return `<div class="detail-row">
@@ -1511,6 +1573,8 @@ function buildDetailView(log) {
       <div class="detail-grid">
         ${row("Class", log.airspaceClass)}
         ${row("LAANC", log.laanc)}
+        ${fullRow("Operational Flags", operationalText)}
+        ${fullRow("Operational Notes", log.operationalNotes)}
         ${row("Aloft / B4UFLY", log.aloftChecked ? "Yes" : "No")}
         ${row("Local Rules", log.localAware ? "Yes" : "No")}
       </div>
